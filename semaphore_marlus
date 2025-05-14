@@ -28,7 +28,9 @@ INITIALISATION
 	semaphoreOL := {LEFT|->RED, RIGHT|->RED,AHEAD|->RED} ||
 	cars := DIRECTIONS * {0}  
 OPERATIONS 
+// direção de quem vem do norte para o sul
 
+//norte sul para seguir em frente
 alter_semaphoreNS_AHEAD_to_green = 
 PRE semaphoreNS[{AHEAD}] = {RED} & semaphoreSN[{LEFT}] = {RED} &
     semaphoreLO[{LEFT}] = {RED} &  semaphoreLO[{AHEAD}] = {RED} &
@@ -36,25 +38,48 @@ PRE semaphoreNS[{AHEAD}] = {RED} & semaphoreSN[{LEFT}] = {RED} &
 THEN semaphoreNS := semaphoreNS <+ ({AHEAD |-> GREEN}) 
 END;
 
+
+// ns para entrar a esquerda
 alter_semaphoreNS_LEFT_to_green = 
 PRE semaphoreNS[{LEFT}] = {RED} & semaphoreSN[{LEFT}] = {RED} &
     semaphoreSN[{AHEAD}] = {RED} &
     semaphoreLO[{LEFT}] = {RED} &  semaphoreLO[{AHEAD}] = {RED} &
      semaphoreOL[{LEFT}] = {RED} &  semaphoreOL[{AHEAD}] = {RED}
-THEN semaphoreNS := semaphoreNS <+ ({AHEAD |-> GREEN}) 
+THEN semaphoreNS := semaphoreNS <+ ({LEFT |-> GREEN}) 
 END;
 
+
+//ns para entra a direita
 alter_semaphoreNS_RIGHT_to_green = 
 PRE semaphoreNS[{RIGHT}] = {RED} & semaphoreLO[{AHEAD}] = {RED}
-THEN semaphoreNS := semaphoreNS <+ ({AHEAD |-> GREEN}) 
+THEN semaphoreNS := semaphoreNS <+ ({RIGHT |-> GREEN}) 
 END;
-// todas acima estão ok
+
+// direção de quem vem do sul para o norte
 alter_semaphoreSN_AHEAD_to_green = 
 PRE semaphoreSN[{AHEAD}] = {RED} & semaphoreNS[{LEFT}] = {RED} &
     semaphoreLO[{LEFT}] = {RED} &  semaphoreLO[{AHEAD}] = {RED} &
      semaphoreOL[{LEFT}] = {RED} &  semaphoreOL[{AHEAD}] = {RED}
-THEN semaphoreNS := semaphoreNS <+ ({AHEAD |-> GREEN}) 
+THEN semaphoreSN := semaphoreSN <+ ({AHEAD |-> GREEN}) 
 END;
+
+alter_semaphoreSN_LEFT_to_green = 
+PRE semaphoreSN[{LEFT}] = {RED} & semaphoreNS[{LEFT}] = {RED} & 
+    semaphoreNS[{AHEAD}] = {RED} &
+    semaphoreLO[{LEFT}] = {RED} &  semaphoreLO[{AHEAD}] = {RED} &
+     semaphoreOL[{LEFT}] = {RED} &  semaphoreOL[{AHEAD}] = {RED}
+THEN semaphoreSN := semaphoreSN <+ ({LEFT |-> GREEN}) 
+END;
+
+alter_semaphoreSN_RIGHT_to_green = 
+PRE semaphoreSN[{RIGHT}] = {RED} & semaphoreOL[{AHEAD}] = {RED}
+THEN semaphoreSN := semaphoreSN <+ ({RIGHT |-> GREEN}) 
+END;
+
+
+
+// todas acima estão ok
+
 
 //alter_semaphoreNS_LEFT_to_green = 
 //PRE 
