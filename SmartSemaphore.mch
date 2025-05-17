@@ -8,37 +8,50 @@ MACHINE
 
 SETS 
      SEMAPHORE = {LEFT,RIGHT,AHEAD};
-     COLORS = {GREEN,YELLOW,RED};
-     DIRECTIONS = {NORTH, SOUTH, EAST, WEST}
+     COLOR = {GREEN,YELLOW,RED};
+     DIRECTION = {NORTH, SOUTH, EAST, WEST};
+     STATE = {NS, LO, DNS, DLO}
+     
+CONSTANTS
+
+    max_time
+
+PROPERTIES
+
+    max_time:NAT1
 
 VARIABLES
     semaphoreNS, 
     semaphoreOL, 
     semaphoreLO, 
     semaphoreSN, 
-    cars
+    cars,
+    time,
+    sequence,
+    has_priority,
+    current_state
 
 INVARIANT
 
      // Tipagens
-     semaphoreNS : SEMAPHORE --> COLORS &
-     semaphoreSN : SEMAPHORE --> COLORS &
-     semaphoreLO : SEMAPHORE --> COLORS &
-     semaphoreOL : SEMAPHORE --> COLORS &
-     cars : DIRECTIONS --> NAT   &
+     semaphoreNS : SEMAPHORE --> COLOR &
+     semaphoreSN : SEMAPHORE --> COLOR &
+     semaphoreLO : SEMAPHORE --> COLOR &
+     semaphoreOL : SEMAPHORE --> COLOR &
+     cars : DIRECTION --> NAT   &
+     time: SEMAPHORE --> 0..max_time &
+     sequence: perm(STATE) &
+     has_priority: BOOL &
+     current_state: STATE &
 
       // Requisitos de segurança
 
-
-      semaphoreNS[{AHEAD}] = {GREEN} <=> semaphoreLO[{AHEAD}] = {RED} &
-      semaphoreSN[{AHEAD}] = {GREEN} <=> semaphoreOL[{AHEAD}] = {RED} &
-
-     (semaphoreNS[{LEFT}] = semaphoreNS[{RIGHT}]) <=> 
-          (semaphoreSN[{LEFT}] = semaphoreSN[{RIGHT}] )  &
-
-     (semaphoreLO[{LEFT}] = semaphoreLO[{RIGHT}]) <=> 
-           (semaphoreOL[{LEFT}] = semaphoreOL[{RIGHT}] ) &
-
+     // TODO: Simplificar essas quatro expressões (provavelmente usando OR)
+    (semaphoreNS[{AHEAD}] = {GREEN}) => (semaphoreLO[{AHEAD}]  \/ semaphoreOL[{AHEAD}] = {RED} ) &
+    (semaphoreSN[{AHEAD}] = {GREEN}) => (semaphoreLO[{AHEAD}]  \/ semaphoreOL[{AHEAD}] = {RED} ) &
+    (semaphoreLO[{AHEAD}] = {GREEN}) => (semaphoreNS[{AHEAD}]  \/ semaphoreSN[{AHEAD}] = {RED} ) &
+    (semaphoreOL[{AHEAD}] = {GREEN}) => (semaphoreNS[{AHEAD}]  \/ semaphoreSN[{AHEAD}] = {RED} ) &
+   
 
      ( (semaphoreNS[{AHEAD}] = {RED} & semaphoreNS[{LEFT}] = {RED}) <=>  
             (semaphoreSN[{AHEAD}] = {RED} & semaphoreSN[{LEFT}] = {RED}) 
@@ -55,18 +68,27 @@ INITIALISATION
      semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
      semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||  
      semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
-     cars := DIRECTIONS * {0}  
+     cars := DIRECTION * {0}   ||
+     time := SEMAPHORE * {5} ||
+     sequence := [LO, DNS, DLO, NS] ||
+     has_priority := FALSE ||
+     current_state := NS
 
 OPERATIONS 
-/*
-alter_semaphoreNS_AH_to_green = 
-PRE semaphoreNS[{AHEAD}] = {RED}
-THEN semaphoreNS := semaphoreNS <+ ({AHEAD |-> GREEN}) 
-END;
-*/
 
+    /*
+    TODO: quando tiver prioridade e for para o próximo estado do semáforo, 
+eu tenho que remover o estado colocado na frente e ir pro próximo
+    */
+    prioritize (ss) =
+        PRE ss : STATE & ss /= current_state & has_priority = FALSE
+        THEN has_priority := TRUE || sequence := ss -> sequence 
+        END;
  
     sl, sr,sa <-- status_semaphoreNS = 
-        sl, sr, sa := semaphoreNS[{LEFT}], semaphoreNS[{RIGHT}], semaphoreNS[{AHEAD}] 
+        sl, sr, sa := semaphoreNS[{LEFT}], semaphoreNS[{RIGHT}], semaphoreNS[{AHEAD}] ;
+
+    sq <-- show_sequency =
+         sq := sequence
        
 END
