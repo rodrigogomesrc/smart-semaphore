@@ -10,15 +10,16 @@ SETS
      SEMAPHORE = {LEFT,RIGHT,AHEAD};
      COLOR = {GREEN,YELLOW,RED};
      DIRECTION = {NORTH, SOUTH, EAST, WEST};
-     STATE = {NS, LO, DNS, DLO}
+     STATE = {NS, LO, DNS, DLO} // Norte-Sul, Leste-Oeste, Diagonal Norte-Sul, Diagonal Leste-Oeste
      
 CONSTANTS
 
+    min_time,
     max_time
-
+    
 PROPERTIES
 
-    max_time:NAT1
+     min_time:NAT1  & max_time:NAT1
 
 VARIABLES
     semaphoreNS, 
@@ -39,7 +40,7 @@ INVARIANT
      semaphoreLO : SEMAPHORE --> COLOR &
      semaphoreOL : SEMAPHORE --> COLOR &
      cars : DIRECTION --> NAT   &
-     time: SEMAPHORE --> 0..max_time &
+     time: STATE --> 0..max_time &
      sequence: perm(STATE) &
      has_priority: BOOL &
      current_state: STATE &
@@ -69,10 +70,10 @@ INITIALISATION
      semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||  
      semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
      cars := DIRECTION * {0}   ||
-     time := SEMAPHORE * {5} ||
+     time := STATE * {5} ||
      sequence := [LO, DNS, DLO, NS] ||
      has_priority := FALSE ||
-     current_state := NS
+     current_state := NS 
 
 OPERATIONS 
 
@@ -84,11 +85,34 @@ eu tenho que remover o estado colocado na frente e ir pro próximo
         PRE ss : STATE & ss /= current_state & has_priority = FALSE
         THEN has_priority := TRUE || sequence := ss -> sequence 
         END;
+
+   calculate_times = 
+       // Previne divisão por 0
+       PRE max({(cars(NORTH) + cars(SOUTH)), (cars(EAST) + cars(WEST))}) /=0
+       THEN 
+            time := time <+ {NS |-> max({((cars(NORTH) + cars(SOUTH)) * max_time) / (max({cars(NORTH) + cars(SOUTH), cars(EAST) + cars(WEST)})), min_time}),
+                                        LO |-> max({((cars(EAST) + cars(WEST)) * max_time) / (max({cars(NORTH) + cars(SOUTH), cars(EAST) + cars(WEST)})), min_time})     }  ||
+            cars := DIRECTION * {0}
+          
+       END;
+
+   addCars(nn,dd) = 
+        PRE nn : NATURAL & dd : DIRECTION
+        THEN cars(dd) := cars(dd) + nn
+        END;
  
     sl, sr,sa <-- status_semaphoreNS = 
         sl, sr, sa := semaphoreNS[{LEFT}], semaphoreNS[{RIGHT}], semaphoreNS[{AHEAD}] ;
 
     sq <-- show_sequency =
          sq := sequence
+
+
+/*
+   tt, t2, t3 <-- tests =
+   tt := ((cars(NORTH) + cars(SOUTH)) * max_time) / (max({cars(NORTH) + cars(SOUTH), cars(EAST) + cars(WEST)}))  ||
+   t2 := (cars(NORTH) + cars(SOUTH)) ||
+   t3 := (cars(NORTH) + cars(SOUTH)) / (max({cars(NORTH) + cars(SOUTH), cars(EAST) + cars(WEST)})) 
+*/
        
 END
