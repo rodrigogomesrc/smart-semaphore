@@ -20,7 +20,7 @@ CONSTANTS
     
 PROPERTIES
 
-     min_time:0..60  & max_time:0..60 & max_cars:0..60
+     min_time:1..50  & max_time:2..50 & max_cars:0..50
 
 VARIABLES
     semaphoreNS, 
@@ -31,6 +31,7 @@ VARIABLES
     time,
     order,
     has_priority,
+    priority,
     timer
 
 INVARIANT
@@ -40,10 +41,11 @@ INVARIANT
      semaphoreSN : SEMAPHORE --> COLOR &
      semaphoreLO : SEMAPHORE --> COLOR &
      semaphoreOL : SEMAPHORE --> COLOR &
-     cars : DIRECTION --> 0..50   &
+     cars : DIRECTION --> 0..max_cars   &
      time: STATE --> 0..max_time &
      order: seq(STATE) &
      has_priority: BOOL &
+     priority: STATE &
      timer: 0..max_time &
 
       // Requisitos de segurança
@@ -67,9 +69,15 @@ INITIALISATION
      time := STATE * {max_time} ||
      order := [LO, DNS, DLO, NS] ||
      has_priority := FALSE ||
-     timer := max_time
+     timer := max_time ||
+     priority := NS
 
 OPERATIONS 
+
+    prioritize (ss) =
+        PRE ss : STATE & has_priority = FALSE
+        THEN has_priority := TRUE || priority := ss || timer := max_time
+        END;
 
    calculate_times = 
        // Previne divisão por 0
@@ -89,13 +97,12 @@ OPERATIONS
         END;
 
     nt <-- process_semaphore =
-        PRE 1=1
+        PRE has_priority = FALSE
         THEN
             IF timer > 0 
            THEN timer := timer - 1 || nt := timer -1  
             ELSE
-                  IF has_priority = TRUE THEN timer := time(order(2)) || order := order \|/ 1 || nt := time(order(2))
-                  ELSE  timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] || nt := time(order(2)) END || 
+                  timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] || nt := time(order(2)) ||
                  IF order(2) = LO THEN 
                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
@@ -117,6 +124,37 @@ OPERATIONS
                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} 
                 END
+            END 
+         END;
+
+    nt <-- process_semaphore_priority =
+        PRE has_priority = TRUE
+        THEN
+            IF timer > 0 
+           THEN timer := timer - 1 || nt := timer -1  
+            ELSE
+                 timer := time(order(2)) || nt := time(order(2)) ||
+                 IF priority = LO THEN 
+                    semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
+                    semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                    semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
+                    semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} 
+                ELSIF priority = DNS THEN 
+                    semaphoreNS := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreSN := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreOL :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} 
+                ELSIF priority = DLO THEN  
+                    semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN}  ||
+                    semaphoreSN :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreLO := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreOL :=  {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} 
+                 ELSE
+                    semaphoreNS :=  {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
+                    semaphoreSN :={LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
+                    semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                    semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} 
+                END || has_priority := FALSE
             END 
          END;
  
