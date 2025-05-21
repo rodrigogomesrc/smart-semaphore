@@ -28,9 +28,9 @@ VARIABLES
     semaphoreSN, 
     cars,
     time,
-    sequence,
+    order,
     has_priority,
-    current_state
+    timer
 
 INVARIANT
 
@@ -41,39 +41,32 @@ INVARIANT
      semaphoreOL : SEMAPHORE --> COLOR &
      cars : DIRECTION --> NAT   &
      time: STATE --> 0..max_time &
-     sequence: perm(STATE) &
+     order: seq(STATE) &
      has_priority: BOOL &
-     current_state: STATE &
+     timer: 0..max_time &
 
       // Requisitos de segurança
+   ((semaphoreNS(AHEAD) = GREEN)  or (semaphoreSN(AHEAD) = GREEN)) => (semaphoreLO(AHEAD) = RED & semaphoreOL(AHEAD) = RED) &  // NS
+   ((semaphoreLO(AHEAD) = GREEN)  or (semaphoreOL(AHEAD) = GREEN)) => (semaphoreSN(AHEAD) = RED & semaphoreNS(AHEAD) = RED) &  // LO
 
-     // TODO: Simplificar essas quatro expressões (provavelmente usando OR)
-    (semaphoreNS[{AHEAD}] = {GREEN}) => (semaphoreLO[{AHEAD}]  \/ semaphoreOL[{AHEAD}] = {RED} ) &
-    (semaphoreSN[{AHEAD}] = {GREEN}) => (semaphoreLO[{AHEAD}]  \/ semaphoreOL[{AHEAD}] = {RED} ) &
-    (semaphoreLO[{AHEAD}] = {GREEN}) => (semaphoreNS[{AHEAD}]  \/ semaphoreSN[{AHEAD}] = {RED} ) &
-    (semaphoreOL[{AHEAD}] = {GREEN}) => (semaphoreNS[{AHEAD}]  \/ semaphoreSN[{AHEAD}] = {RED} ) &
-   
+   (semaphoreNS(LEFT) = GREEN or semaphoreSN(LEFT) = GREEN) 
+         => (semaphoreLO(LEFT) = RED &  semaphoreLO(AHEAD) = RED &  semaphoreOL(LEFT) = RED &  semaphoreOL(AHEAD) = RED) & // DNS
 
-     ( (semaphoreNS[{AHEAD}] = {RED} & semaphoreNS[{LEFT}] = {RED}) <=>  
-            (semaphoreSN[{AHEAD}] = {RED} & semaphoreSN[{LEFT}] = {RED}) 
-               & semaphoreLO[{AHEAD}]  = {RED} & semaphoreOL[{AHEAD}]  = {RED})  &
-
-      ((semaphoreLO[{AHEAD}] = {RED} & semaphoreLO[{LEFT}] = {RED}) <=>  
-            (semaphoreOL[{AHEAD}] = {RED} & semaphoreOL[{LEFT}] = {RED})  
-                & semaphoreNS[{AHEAD}]  = {RED} & semaphoreSN[{AHEAD}]  = {RED})
+    (semaphoreOL(LEFT) = GREEN or semaphoreLO(LEFT) = GREEN) 
+         => (semaphoreNS(LEFT) = RED &  semaphoreNS(AHEAD) = RED &  semaphoreSN(LEFT) = RED &  semaphoreSN(AHEAD) = RED)   // DLO
 
 
 INITIALISATION
 
      semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
      semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
-     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||  
-     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
+     semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
+     semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||
      cars := DIRECTION * {0}   ||
-     time := STATE * {5} ||
-     sequence := [LO, DNS, DLO, NS] ||
+     time := STATE * {max_time} ||
+     order := [LO, DNS, DLO, NS] ||
      has_priority := FALSE ||
-     current_state := NS 
+     timer := max_time
 
 OPERATIONS 
 
@@ -82,8 +75,8 @@ OPERATIONS
 eu tenho que remover o estado colocado na frente e ir pro próximo
     */
     prioritize (ss) =
-        PRE ss : STATE & ss /= current_state & has_priority = FALSE
-        THEN has_priority := TRUE || sequence := ss -> sequence 
+        PRE ss : STATE & ss /= order(1) & has_priority = FALSE
+        THEN has_priority := TRUE || order := ss -> order 
         END;
 
    calculate_times = 
@@ -102,12 +95,57 @@ eu tenho que remover o estado colocado na frente e ir pro próximo
         PRE nn : NATURAL & dd : DIRECTION
         THEN cars(dd) := cars(dd) + nn
         END;
+
+   //  [LO, DNS, DLO, NS]
+    nt <-- process_semaphore =
+        PRE 1=1
+        THEN
+            IF timer > 0 
+           THEN timer := timer - 1 || nt := timer -1  
+           // Colocar um ELSIF aqui para os semáforos amarelos?
+            ELSE
+                 timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] || nt := time(order(2)) || 
+                 IF order(2) = LO THEN 
+                    semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
+                    semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                    semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
+                    semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} 
+                ELSIF order(2) = DNS THEN 
+                    semaphoreNS := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreSN := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreOL :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} 
+                ELSIF order(2) = DLO THEN  
+                    semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN}  ||
+                    semaphoreSN :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreLO := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
+                    semaphoreOL :=  {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} 
+                 ELSE
+                    semaphoreNS :=  {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
+                    semaphoreSN :={LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
+                    semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                    semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} 
+                END
+            END 
+         END;
  
     sl, sr,sa <-- status_semaphoreNS = 
         sl, sr, sa := semaphoreNS[{LEFT}], semaphoreNS[{RIGHT}], semaphoreNS[{AHEAD}] ;
 
+    sl, sr,sa <-- status_semaphoreSN = 
+        sl, sr, sa := semaphoreSN[{LEFT}], semaphoreSN[{RIGHT}], semaphoreSN[{AHEAD}] ;
+
+    sl, sr,sa <-- status_semaphoreLO = 
+        sl, sr, sa := semaphoreLO[{LEFT}], semaphoreLO[{RIGHT}], semaphoreLO[{AHEAD}] ;
+
+   sl, sr,sa <-- status_semaphoreOL = 
+        sl, sr, sa := semaphoreOL[{LEFT}], semaphoreOL[{RIGHT}], semaphoreOL[{AHEAD}] ;
+
     sq <-- show_sequency =
-         sq := sequence
+         sq := order;
+
+   cs <-- current_state =
+         cs := order(1)
 
 
 /*
