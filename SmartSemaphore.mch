@@ -70,10 +70,6 @@ INITIALISATION
 
 OPERATIONS 
 
-    /*
-    TODO: quando tiver prioridade e for para o próximo estado do semáforo, 
-eu tenho que remover o estado colocado na frente e ir pro próximo
-    */
     prioritize (ss) =
         PRE ss : STATE & ss /= order(1) & has_priority = FALSE
         THEN has_priority := TRUE || order := ss -> order 
@@ -96,7 +92,6 @@ eu tenho que remover o estado colocado na frente e ir pro próximo
         THEN cars(dd) := cars(dd) + nn
         END;
 
-   //  [LO, DNS, DLO, NS]
     nt <-- process_semaphore =
         PRE 1=1
         THEN
@@ -104,7 +99,8 @@ eu tenho que remover o estado colocado na frente e ir pro próximo
            THEN timer := timer - 1 || nt := timer -1  
            // Colocar um ELSIF aqui para os semáforos amarelos?
             ELSE
-                 timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] || nt := time(order(2)) || 
+                  IF has_priority = TRUE THEN timer := time(order(2)) || order := order \|/ 1 || nt := time(order(2))
+                  ELSE  timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] || nt := time(order(2)) END || 
                  IF order(2) = LO THEN 
                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
