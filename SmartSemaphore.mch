@@ -97,7 +97,6 @@ OPERATIONS
         THEN
             IF timer > 0 
            THEN timer := timer - 1 || nt := timer -1  
-           // Colocar um ELSIF aqui para os semáforos amarelos?
             ELSE
                   IF has_priority = TRUE THEN timer := time(order(2)) || order := order \|/ 1 || nt := time(order(2))
                   ELSE  timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] || nt := time(order(2)) END || 
@@ -136,19 +135,5 @@ OPERATIONS
 
    sl, sr,sa <-- status_semaphoreOL = 
         sl, sr, sa := semaphoreOL[{LEFT}], semaphoreOL[{RIGHT}], semaphoreOL[{AHEAD}] ;
-
-    sq <-- show_sequency =
-         sq := order;
-
-   cs <-- current_state =
-         cs := order(1)
-
-
-/*
-   tt, t2, t3 <-- tests =
-   tt := ((cars(NORTH) + cars(SOUTH)) * max_time) / (max({cars(NORTH) + cars(SOUTH), cars(EAST) + cars(WEST)}))  ||
-   t2 := (cars(NORTH) + cars(SOUTH)) ||
-   t3 := (cars(NORTH) + cars(SOUTH)) / (max({cars(NORTH) + cars(SOUTH), cars(EAST) + cars(WEST)})) 
-*/
        
 END
