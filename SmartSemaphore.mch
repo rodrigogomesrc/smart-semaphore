@@ -15,11 +15,12 @@ SETS
 CONSTANTS
 
     min_time,
-    max_time
+    max_time,
+    max_cars
     
 PROPERTIES
 
-     min_time:NAT1  & max_time:NAT1
+     min_time:0..60  & max_time:0..60 & max_cars:0..60
 
 VARIABLES
     semaphoreNS, 
@@ -39,7 +40,7 @@ INVARIANT
      semaphoreSN : SEMAPHORE --> COLOR &
      semaphoreLO : SEMAPHORE --> COLOR &
      semaphoreOL : SEMAPHORE --> COLOR &
-     cars : DIRECTION --> NAT   &
+     cars : DIRECTION --> 0..50   &
      time: STATE --> 0..max_time &
      order: seq(STATE) &
      has_priority: BOOL &
@@ -70,11 +71,6 @@ INITIALISATION
 
 OPERATIONS 
 
-    prioritize (ss) =
-        PRE ss : STATE & ss /= order(1) & has_priority = FALSE
-        THEN has_priority := TRUE || order := ss -> order 
-        END;
-
    calculate_times = 
        // Previne divisão por 0
        PRE max({(cars(NORTH) + cars(SOUTH)), (cars(EAST) + cars(WEST))}) /=0
@@ -88,7 +84,7 @@ OPERATIONS
        END;
 
    addCars(nn,dd) = 
-        PRE nn : NATURAL & dd : DIRECTION
+        PRE nn : NATURAL & dd : DIRECTION & cars(dd) + nn < max_cars
         THEN cars(dd) := cars(dd) + nn
         END;
 
@@ -134,6 +130,6 @@ OPERATIONS
         sl, sr, sa := semaphoreLO[{LEFT}], semaphoreLO[{RIGHT}], semaphoreLO[{AHEAD}] ;
 
    sl, sr,sa <-- status_semaphoreOL = 
-        sl, sr, sa := semaphoreOL[{LEFT}], semaphoreOL[{RIGHT}], semaphoreOL[{AHEAD}] ;
+        sl, sr, sa := semaphoreOL[{LEFT}], semaphoreOL[{RIGHT}], semaphoreOL[{AHEAD}] 
        
 END
