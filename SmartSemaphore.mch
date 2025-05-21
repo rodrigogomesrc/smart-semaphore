@@ -49,14 +49,14 @@ INVARIANT
      timer: 0..max_time &
 
       // Requisitos de segurança
-   ((semaphoreNS(AHEAD) = GREEN)  or (semaphoreSN(AHEAD) = GREEN)) => (semaphoreLO(AHEAD) = RED & semaphoreOL(AHEAD) = RED) &  // NS
-   ((semaphoreLO(AHEAD) = GREEN)  or (semaphoreOL(AHEAD) = GREEN)) => (semaphoreSN(AHEAD) = RED & semaphoreNS(AHEAD) = RED) &  // LO
+   (((semaphoreNS(AHEAD) = GREEN)  or (semaphoreSN(AHEAD) = GREEN)) => (semaphoreLO(AHEAD) = RED & semaphoreOL(AHEAD) = RED)) &  // NS
+   (((semaphoreLO(AHEAD) = GREEN)  or (semaphoreOL(AHEAD) = GREEN)) => (semaphoreSN(AHEAD) = RED & semaphoreNS(AHEAD) = RED)) &  // LO
 
-   (semaphoreNS(LEFT) = GREEN or semaphoreSN(LEFT) = GREEN) 
-         => (semaphoreLO(LEFT) = RED &  semaphoreLO(AHEAD) = RED &  semaphoreOL(LEFT) = RED &  semaphoreOL(AHEAD) = RED) & // DNS
+   ((semaphoreNS(LEFT) = GREEN or semaphoreSN(LEFT) = GREEN) 
+         => (semaphoreLO(LEFT) = RED &  semaphoreLO(AHEAD) = RED &  semaphoreOL(LEFT) = RED &  semaphoreOL(AHEAD) = RED)) & // DNS
 
-    (semaphoreOL(LEFT) = GREEN or semaphoreLO(LEFT) = GREEN) 
-         => (semaphoreNS(LEFT) = RED &  semaphoreNS(AHEAD) = RED &  semaphoreSN(LEFT) = RED &  semaphoreSN(AHEAD) = RED)   // DLO
+    ((semaphoreOL(LEFT) = GREEN or semaphoreLO(LEFT) = GREEN) 
+         => (semaphoreNS(LEFT) = RED &  semaphoreNS(AHEAD) = RED &  semaphoreSN(LEFT) = RED &  semaphoreSN(AHEAD) = RED))   // DLO
 
 
 INITIALISATION
