@@ -20,9 +20,9 @@ CONSTANTS
     
 PROPERTIES
 
-     min_time:1..50  & 
-     max_time:0..50 & 
-     max_cars:0..50 &
+     min_time:1..10  & 
+     max_time:0..10 & 
+     max_cars:0..10 &
      max_time > min_time
 
 VARIABLES
@@ -52,7 +52,7 @@ INVARIANT
      timer: 0..max_time &
 
       // Requisitos de segurança
-   ((semaphoreNS(AHEAD) = GREEN)  or (semaphoreSN(AHEAD) = GREEN)) => (semaphoreLO(AHEAD) = RED & semaphoreOL(AHEAD) = RED) &  // NS
+ ((semaphoreNS(AHEAD) = GREEN)  or (semaphoreSN(AHEAD) = GREEN)) => (semaphoreLO(AHEAD) = RED & semaphoreOL(AHEAD) = RED) &  // NS
    ((semaphoreLO(AHEAD) = GREEN)  or (semaphoreOL(AHEAD) = GREEN)) => (semaphoreSN(AHEAD) = RED & semaphoreNS(AHEAD) = RED) &  // LO
 
    (semaphoreNS(LEFT) = GREEN or semaphoreSN(LEFT) = GREEN) 
@@ -174,7 +174,6 @@ OPERATIONS
             sr :: semaphoreSN[{RIGHT}] ||
             sa :: semaphoreSN[{LEFT}]
         END;
-
     sl, sr,sa <-- status_semaphoreLO = 
          BEGIN
             sl :: semaphoreLO[{LEFT}] ||
