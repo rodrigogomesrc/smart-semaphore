@@ -119,44 +119,44 @@ OPERATIONS
 		ELSE 
 		   yellow_timer := yellow_timer -1 ||
                    IF order(2) = LO THEN 
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
-                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
-                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} 
+                       semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
+                       semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                       semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
+                       semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} 
                    ELSIF order(2) = DNS THEN 
-                     semaphoreNS := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreSN := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} 
+                        semaphoreNS := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreSN := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreLO := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreOL := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED}                            
                    ELSIF order(2) = DLO THEN  
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW}  ||
-                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreLO := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreOL := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} 
-                   ELSE
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
-                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
-                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} 
-                  END
+                        semaphoreNS := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED}  ||
+                        semaphoreSN := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreLO := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreOL := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED} 
+                    ELSE
+                        semaphoreNS :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
+                        semaphoreSN :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
+                        semaphoreLO :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                        semaphoreOL :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED}                   
+                    END
                 END || nt := timer			
             ELSE
                   timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] || nt := time(order(2)) ||
                 IF order(2) = LO THEN 
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
-                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
-                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} 
+                    semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
+                    semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                    semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
+                    semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} 
                 ELSIF order(2) = DNS THEN 
-                     semaphoreNS := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                     semaphoreSN := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                     semaphoreOL :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} 
+                     semaphoreNS := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreSN := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} 
                 ELSIF order(2) = DLO THEN  
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN}  ||
-                     semaphoreSN :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                     semaphoreLO := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                     semaphoreOL :=  {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} 
+                     semaphoreNS := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED}  ||
+                     semaphoreSN := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} 
                  ELSE
                     semaphoreNS :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
                     semaphoreSN :={LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
@@ -176,48 +176,48 @@ OPERATIONS
 		  THEN timer := 0 || yellow_timer := yellow_time
 	       ELSE 
 		  yellow_timer := yellow_timer -1 ||
-                  IF order(2) = LO THEN 
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
-                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
-                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} 
+                    IF order(2) = LO THEN 
+                       semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
+                       semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                       semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
+                       semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} 
                    ELSIF order(2) = DNS THEN 
-                     semaphoreNS := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreSN := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} 
+                        semaphoreNS := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreSN := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreLO := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreOL := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED}                            
                    ELSIF order(2) = DLO THEN  
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW}  ||
-                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreLO := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} ||
-                     semaphoreOL := {LEFT |-> YELLOW, RIGHT |-> RED, AHEAD |-> YELLOW} 
-                   ELSE
-                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
-                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
-                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
-                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} 
-                  END	
+                        semaphoreNS := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED}  ||
+                        semaphoreSN := {LEFT |-> RED, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreLO := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED} ||
+                        semaphoreOL := {LEFT |-> YELLOW, RIGHT |-> YELLOW, AHEAD |-> RED} 
+                    ELSE
+                        semaphoreNS :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
+                        semaphoreSN :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> YELLOW} ||  
+                        semaphoreLO :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
+                        semaphoreOL :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED}                   
+                    END
                END || nt := timer			
             ELSE
                  timer := time(order(2)) || nt := time(order(2)) ||
-                 IF priority = LO THEN 
+                  IF order(2) = LO THEN 
                     semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||
                     semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
-                    semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} ||  
-                    semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> GREEN} 
-                ELSIF priority = DNS THEN 
-                    semaphoreNS := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                    semaphoreSN := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                    semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                    semaphoreOL :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} 
-                ELSIF priority = DLO THEN  
-                    semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN}  ||
-                    semaphoreSN :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                    semaphoreLO := {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} ||
-                    semaphoreOL :=  {LEFT |-> GREEN, RIGHT |-> RED, AHEAD |-> GREEN} 
+                    semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
+                    semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} 
+                ELSIF order(2) = DNS THEN 
+                     semaphoreNS := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreSN := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} 
+                ELSIF order(2) = DLO THEN  
+                     semaphoreNS := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED}  ||
+                     semaphoreSN := {LEFT |-> RED, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreLO := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} ||
+                     semaphoreOL := {LEFT |-> GREEN, RIGHT |-> GREEN, AHEAD |-> RED} 
                  ELSE
-                    semaphoreNS :=  {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
-                    semaphoreSN :={LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
+                    semaphoreNS := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
+                    semaphoreSN := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> GREEN} ||  
                     semaphoreLO := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} ||   
                     semaphoreOL := {LEFT |-> RED, RIGHT |-> RED, AHEAD |-> RED} 
                 END || has_priority := FALSE
