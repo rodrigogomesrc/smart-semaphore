@@ -42,7 +42,6 @@ VARIABLES
     time,
     order,
     has_priority,
-    yellow,
     priority,
     timer,
     yellow_timer
@@ -53,7 +52,6 @@ INVARIANT
      time: STATE --> 0..max_time &
      order: seq(STATE) &
      has_priority: BOOL &
-     yellow: BOOL &
      priority: STATE &
      timer: 0..max_time &
      yellow_timer: 0..yellow_time &
@@ -69,14 +67,22 @@ INITIALISATION
      time := STATE * {max_time} ||
      order := [LO, DNS, DLO, NS] ||
      has_priority := FALSE ||
-     yellow := FALSE ||
      timer := max_time ||
      priority := NS || 
      yellow_timer := yellow_time ||
      paths := {
-	NS_L |-> {}, NS_A |-> {}, NS_R |-> {},
-	SN_L |-> {}, SN_A |-> {}, SN_R |-> {},
-	LO_L |-> {}, LO_A |-> {}, LO_R |-> {}
+	NS_L |-> {}, 
+        NS_A |-> {}, 
+        NS_R |-> {},
+	SN_L |-> {}, 
+        SN_A |-> {}, 
+        SN_R |-> {},
+	LO_L |-> {}, 
+        LO_A |-> {}, 
+        LO_R |-> {},
+        OL_L |-> {}, 
+        OL_A |-> {}, 
+        OL_R |-> {}
       }
 
 OPERATIONS 
