@@ -128,9 +128,9 @@ OPERATIONS
     nt <-- process_semaphore =
         PRE has_priority = FALSE
         THEN
-            IF timer > 1 
+            IF timer > 0 
             	THEN timer := timer - 1 || nt := timer -1
-            ELSIF timer = 1 THEN
+            ELSIF timer = 0 THEN
 	        IF yellow_timer = 0 
                    THEN timer := 0 || yellow_timer := yellow_time
 		ELSE 
@@ -166,6 +166,47 @@ OPERATIONS
                   ELSE
                         semaphores := (SEMAPHORE * {RED}) <+ {NS_A |-> GREEN, SN_A |-> GREEN}               
                   END
+            END 
+         END;
+
+    st, yt <-- process_semaphore2 =
+        PRE has_priority = FALSE
+        THEN
+            IF timer > 0 
+            	THEN timer := timer - 1 || st := timer -1 || yt := yellow_timer
+            ELSIF (timer = 0 & yellow_timer > 0) THEN
+		 IF order(1) = LO THEN 
+		    semaphores := (SEMAPHORE * {RED}) <+ {LO_A |-> YELLOW, OL_A |-> YELLOW}
+
+                 ELSIF order(1) = DNS THEN
+                    semaphores := (SEMAPHORE * {RED}) <+ {NS_R |-> YELLOW, SN_R |-> YELLOW,
+                             LO_L |-> YELLOW, LO_R |-> YELLOW, OL_L |-> YELLOW, OL_R |-> YELLOW}
+                        
+                 ELSIF order(1) = DLO THEN  
+                    semaphores := (SEMAPHORE * {RED}) <+ {NS_R |-> YELLOW, SN_R |-> YELLOW,
+                             LO_L |-> YELLOW, LO_R |-> YELLOW, OL_L |-> YELLOW, OL_R |-> YELLOW}
+
+                 ELSE
+                    semaphores := (SEMAPHORE * {RED}) <+ {NS_A |-> YELLOW, SN_A |-> YELLOW}               
+                END ||
+                yellow_timer := yellow_timer -1 || st := timer || yt := yellow_timer -1       	
+            ELSE
+                timer := time(order(2)) || order := order \|/ 1 ^ [order(1)] ||
+                 IF order(2) = LO THEN 
+		        semaphores := (SEMAPHORE * {RED}) <+ {LO_A |-> GREEN, OL_A |-> GREEN}
+
+                 ELSIF order(2) = DNS THEN
+                        semaphores := (SEMAPHORE * {RED}) <+ {SN_R |-> GREEN, SN_L |-> GREEN,
+                             LO_R |-> GREEN, OL_R |-> GREEN, NS_R |-> GREEN, NS_L |-> GREEN}
+                        
+                 ELSIF order(2) = DLO THEN  
+                        semaphores := (SEMAPHORE * {RED}) <+ {NS_R |-> GREEN, SN_R |-> GREEN,
+                             LO_L |-> GREEN, LO_R |-> GREEN, OL_L |-> GREEN, OL_R |-> GREEN}
+
+                 ELSE
+                        semaphores := (SEMAPHORE * {RED}) <+ {NS_A |-> GREEN, SN_A |-> GREEN}               
+                 END ||
+                yt := yellow_timer || st := time(order(2)) || yellow_timer := yellow_time
             END 
          END;
 
@@ -212,9 +253,50 @@ OPERATIONS
                   END || has_priority := FALSE
             END 
          END;
+
+     st, yt <-- process_semaphore_priority2 =
+        PRE has_priority = TRUE
+        THEN
+            IF timer > 0 
+            	THEN timer := timer - 1 || st := timer -1 || yt := yellow_timer
+            ELSIF (timer = 0 & yellow_timer > 0) THEN
+		 IF order(1) = LO THEN 
+		    semaphores := (SEMAPHORE * {RED}) <+ {LO_A |-> YELLOW, OL_A |-> YELLOW}
+
+                 ELSIF order(1) = DNS THEN
+                    semaphores := (SEMAPHORE * {RED}) <+ {NS_R |-> YELLOW, SN_R |-> YELLOW,
+                             LO_L |-> YELLOW, LO_R |-> YELLOW, OL_L |-> YELLOW, OL_R |-> YELLOW}
+                        
+                 ELSIF order(1) = DLO THEN  
+                    semaphores := (SEMAPHORE * {RED}) <+ {NS_R |-> YELLOW, SN_R |-> YELLOW,
+                             LO_L |-> YELLOW, LO_R |-> YELLOW, OL_L |-> YELLOW, OL_R |-> YELLOW}
+
+                 ELSE
+                    semaphores := (SEMAPHORE * {RED}) <+ {NS_A |-> YELLOW, SN_A |-> YELLOW}               
+                END ||
+                yellow_timer := yellow_timer -1 || st := timer || yt := yellow_timer -1       	
+            ELSE
+                 timer := time(order(2)) ||
+                 IF order(2) = LO THEN 
+		        semaphores := (SEMAPHORE * {RED}) <+ {LO_A |-> GREEN, OL_A |-> GREEN}
+
+                 ELSIF order(2) = DNS THEN
+                         semaphores := (SEMAPHORE * {RED}) <+ {SN_R |-> GREEN, SN_L |-> GREEN,
+                             LO_R |-> GREEN, OL_R |-> GREEN, NS_R |-> GREEN, NS_L |-> GREEN}
+                        
+                 ELSIF order(2) = DLO THEN  
+                        semaphores := (SEMAPHORE * {RED}) <+ {NS_R |-> GREEN, SN_R |-> GREEN,
+                             LO_L |-> GREEN, LO_R |-> GREEN, OL_L |-> GREEN, OL_R |-> GREEN}
+
+                 ELSE
+                        semaphores := (SEMAPHORE * {RED}) <+ {NS_A |-> GREEN, SN_A |-> GREEN}               
+                 END ||
+                yt := yellow_timer || st := time(order(2)) || has_priority := FALSE || yellow_timer := yellow_time
+            END 
+       END;
  
      ll, aa, rr <-- status_semaphoreNS = 
-        BEGIN
+       BEGIN
            ll := semaphores(NS_L) ||  aa := semaphores(NS_A) ||  rr := semaphores(NS_R)
        END;
     
@@ -231,6 +313,13 @@ OPERATIONS
      ll, aa, rr <-- status_semaphoreOL = 
         BEGIN
            ll := semaphores(OL_L) ||  aa := semaphores(OL_A) ||  rr := semaphores(OL_R)
-       END
+       END;
+
+     tt <-- timer =
+        tt := timer;
+ 
+     tt <-- yellow_timer =
+        tt := yellow_timer
+
      
 END
