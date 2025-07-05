@@ -226,6 +226,6 @@ OPERATIONS
      ll, aa, rr <-- status_semaphoreOL = 
         BEGIN
            ll := semaphores(OL_L) ||  aa := semaphores(OL_A) ||  rr := semaphores(OL_R)
-       END;
+       END
 
 END

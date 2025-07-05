@@ -1,0 +1,98 @@
+/* SmartSemaphore_i
+ * Author: rodri
+ * Creation date: 04/07/2025
+ */
+
+IMPLEMENTATION SmartSemaphore_i
+      
+REFINES SmartSemaphore
+      
+CONCRETE_CONSTANTS
+  direction_enum,
+  time_enum, 
+  color_enum,
+  semaphore_enum
+  
+PROPERTIES
+      
+  direction_enum : 0..3 --> DIRECTION &
+  time_enum : 0..3 --> STATE &
+  color_enum : 0..2 --> COLOR &
+  semaphore_enum : 0..11 --> SEMAPHORE
+
+VALUES
+      
+  min_time = 20;
+  max_time = 60;
+  max_cars=50;
+  yellow_time=10;
+  direction_enum = {0 |-> NORTH, 1 |-> SOUTH, 2 |-> EAST, 3 |-> WEST};
+  time_enum = {0 |-> NS, 1 |-> LO, 2 |-> DNS, 3 |-> DLO};
+  color_enum = {0 |-> GREEN, 1 |-> YELLOW, 2 |-> RED};
+  semaphore_enum = {
+	      0 |-> NS_L, 1 |-> NS_A, 2 |-> NS_R,
+	      3 |-> SN_L, 4 |-> SN_A, 5 |-> SN_R,
+	      6 |-> LO_L, 7 |-> LO_A, 8 |-> LO_R,
+          9 |-> OL_L, 10 |-> OL_A, 11 |-> OL_R
+     }
+  
+CONCRETE_VARIABLES
+      
+  cars_r,
+  time_r,
+  semaphores_r
+  
+INVARIANT
+
+  cars_r : 0..3 --> 0..max_cars &
+  cars = (direction_enum~ ; cars_r) &
+  
+  time_r : 0..3 --> 0..max_time &
+  time = (time_enum~;time_r) &
+  
+  semaphores_r : 0..11 --> 0..2 &
+  semaphores = (semaphore_enum~; semaphores_r; color_enum)
+  
+      
+INITIALISATION
+    BEGIN
+       cars_r := (0..3) * {0};
+       time_r := (0..3) * {max_time};
+       semaphores_r := (0..11) * {2}; // Todos vermelhos
+       semaphores_r(7) := 0; //  LO_A como verde
+       semaphores_r(10) := 0 // OL_A como verde
+    END
+  
+OPERATIONS
+    prioritize (ss) =
+        skip;
+
+   calculate_times = 
+       skip;
+
+   addCars(nn,dd) = 
+        skip;
+
+
+    st, yt <-- process_semaphore =
+        skip;
+
+
+     st, yt <-- process_semaphore_priority =
+       skip;
+
+ 
+     ll, aa, rr <-- status_semaphoreNS = 
+       skip;
+
+    
+     ll, aa, rr <-- status_semaphoreSN = 
+       skip;
+
+    
+     ll, aa, rr <-- status_semaphoreLO = 
+        skip;
+
+     ll, aa, rr <-- status_semaphoreOL = 
+       skip
+ END
