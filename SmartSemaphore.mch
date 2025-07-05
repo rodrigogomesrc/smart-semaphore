@@ -22,8 +22,7 @@ CONSTANTS
     min_time,
     max_time,
     max_cars,
-    yellow_time,
-    grid
+    yellow_time
     
 PROPERTIES
 
@@ -31,8 +30,7 @@ PROPERTIES
      max_time: 0..10 & 
      max_cars: 0..10 &
      max_time > min_time &
-     yellow_time: 0..5 &
-     grid = (0..5) * (0..5)
+     yellow_time: 0..5 
 
 VARIABLES
 
