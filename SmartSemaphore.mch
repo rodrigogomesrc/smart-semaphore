@@ -6,31 +6,8 @@
 MACHINE
     SmartSemaphore
 
-SETS 
-     SEMAPHORE = {
-	NS_L, NS_A, NS_R,
-	SN_L, SN_A, SN_R,
-	LO_L, LO_A, LO_R,
-        OL_L, OL_A, OL_R
-     };
-     COLOR = {GREEN,YELLOW,RED};
-     DIRECTION = {NORTH, SOUTH, EAST, WEST};
-     STATE = {NS, LO, DNS, DLO} // Norte-Sul, Leste-Oeste, Diagonal Norte-Sul, Diagonal Leste-Oeste
-     
-CONSTANTS
-
-    min_time,
-    max_time,
-    max_cars,
-    yellow_time
-    
-PROPERTIES
-
-     min_time: 2..10  & 
-     max_time: 0..10 & 
-     max_cars: 0..10 &
-     max_time > min_time &
-     yellow_time: 0..5 
+SEES
+    SmartSemaphore_ctx
 
 VARIABLES
 
@@ -119,7 +96,7 @@ OPERATIONS
        END;
 
    addCars(nn,dd) = 
-        PRE nn : NATURAL & dd : DIRECTION & cars(dd) + nn < max_cars
+        PRE nn : NAT & dd : DIRECTION & cars(dd) + nn < max_cars
         THEN cars(dd) := cars(dd) + nn
         END;
 
@@ -227,3 +204,4 @@ OPERATIONS
        END
 
 END
+

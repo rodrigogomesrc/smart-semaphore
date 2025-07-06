@@ -1,11 +1,13 @@
 /* SmartSemaphore_i
- * Author: rodri
+ * Author: Rodrigo
  * Creation date: 04/07/2025
  */
 
 IMPLEMENTATION SmartSemaphore_i
       
 REFINES SmartSemaphore
+      
+SEES SmartSemaphore_ctx
       
 CONCRETE_CONSTANTS
   direction_enum,
@@ -22,10 +24,6 @@ PROPERTIES
 
 VALUES
       
-  min_time = 20;
-  max_time = 60;
-  max_cars=50;
-  yellow_time=10;
   direction_enum = {0 |-> NORTH, 1 |-> SOUTH, 2 |-> EAST, 3 |-> WEST};
   time_enum = {0 |-> NS, 1 |-> LO, 2 |-> DNS, 3 |-> DLO};
   color_enum = {0 |-> GREEN, 1 |-> YELLOW, 2 |-> RED};
@@ -38,29 +36,50 @@ VALUES
   
 CONCRETE_VARIABLES
       
-  cars_r,
-  time_r,
-  semaphores_r
+  cars_i,
+  time_i,
+  semaphores_i,
+  has_priority_i,
+  priority_i,
+  timer_i,
+  yellow_timer_i
   
 INVARIANT
 
-  cars_r : 0..3 --> 0..max_cars &
-  cars = (direction_enum~ ; cars_r) &
+  cars_i : 0..3 --> 0..max_cars &
+  cars = (direction_enum~ ; cars_i) &
   
-  time_r : 0..3 --> 0..max_time &
-  time = (time_enum~;time_r) &
+  time_i : 0..3 --> 0..max_time &
+  time = (time_enum~;time_i) &
   
-  semaphores_r : 0..11 --> 0..2 &
-  semaphores = (semaphore_enum~; semaphores_r; color_enum)
+  semaphores_i : 0..11 --> 0..2 &
+  semaphores = (semaphore_enum~; semaphores_i; color_enum) &
+  
+  // Já concretas
+  has_priority_i : BOOL &
+  has_priority = has_priority_i &
+  
+  priority_i : STATE &
+  priority = priority_i &
+  
+  timer_i : 0..max_time &
+  timer = timer_i &
+  
+  yellow_timer_i : 0..yellow_time &
+  yellow_timer = yellow_timer_i
   
       
 INITIALISATION
     BEGIN
-       cars_r := (0..3) * {0};
-       time_r := (0..3) * {max_time};
-       semaphores_r := (0..11) * {2}; // Todos vermelhos
-       semaphores_r(7) := 0; //  LO_A como verde
-       semaphores_r(10) := 0 // OL_A como verde
+       cars_i := (0..3) * {0};
+       time_i := (0..3) * {max_time};
+       semaphores_i := (0..11) * {2}; // Todos vermelhos
+       semaphores_i(7) := 0; //  LO_A como verde
+       semaphores_i(10) := 0; // OL_A como verde
+       has_priority_i := FALSE;
+       priority_i := NS;
+       timer_i := max_time;
+       yellow_timer_i := yellow_time
     END
   
 OPERATIONS

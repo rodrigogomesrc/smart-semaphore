@@ -1,0 +1,15 @@
+/* SmartSemaphore_ctx_i
+ * Author: Rodrigo
+ * Creation date: 06/07/2025
+ */
+
+IMPLEMENTATION SmartSemaphore_ctx_i
+REFINES SmartSemaphore_ctx
+      
+VALUES
+  min_time = 20;
+  max_time = 60;
+  max_cars=50;
+  yellow_time=10
+
+ END
