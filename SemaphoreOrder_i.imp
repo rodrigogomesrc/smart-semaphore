@@ -1,0 +1,37 @@
+IMPLEMENTATION
+   SemaphoreOrder_i
+REFINES
+   SemaphoreOrder
+SEES
+   SmartSemaphore_ctx
+IMPORTS           
+    VArray, SizeCounter, PositionCounter
+
+INVARIANT         
+    sze = size(order) &
+    #aseq . 
+        (aseq = %ii .(ii:1..card(array) | array(ii-1))  
+        & order = ((aseq \|/ pos) ^ (aseq /|\ pos)) 
+                     /|\ 
+                     sze)
+
+OPERATIONS
+
+  add_last(ss) = 
+  VAR ii,jj,pp IN
+    ii <-- szeget;
+    jj <-- posget;
+    pp := (ii + jj) mod 4;
+    set(pp,ss);
+    szeinc
+  END;
+    
+  nn <-- next = 
+  VAR pp IN
+    pp <-- posget;
+    nn <-- get(pp);
+    posinc;
+    szedec
+  END
+
+END
