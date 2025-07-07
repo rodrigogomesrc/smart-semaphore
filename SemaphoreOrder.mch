@@ -6,24 +6,24 @@ SEES
    SmartSemaphore_ctx
 
 VARIABLES         
-   order
+   contents
 
 INVARIANT         
-   order : seq(STATE) & size(order) <= 4
+   contents : seq(STATE) & size(contents) <= 4
 
 INITIALISATION    
-   order := <>
+   contents := <>
 
 OPERATIONS
 
-      add_last(ss) =
-        PRE ss : STATE & size(order) < 4
-        THEN order := order <- ss
+     input(ee) =
+        PRE ee : STATE & size(contents) < 4
+        THEN contents := contents <- ee
         END;
       
-      nn <-- next =
-        PRE size(order) > 0
-        THEN nn := first(order) || order := tail(order)
+     ee <-- output =
+        PRE size(contents) > 0
+        THEN ee := first(contents) || contents := tail(contents)
         END
 
 END
