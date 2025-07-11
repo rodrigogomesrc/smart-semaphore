@@ -1,0 +1,68 @@
+/* Priority_i
+ * Author: rodri
+ * Creation date: 11/07/2025
+ */
+
+IMPLEMENTATION Priority_i
+      
+REFINES Priority
+      
+SEES
+  SmartSemaphore_ctx
+
+VALUES
+  SIZE = 5
+  
+CONCRETE_VARIABLES
+   cursor,
+   current_size,
+   order_i
+   
+INVARIANT
+   cursor: 0..(SIZE -1) &
+   current_size : NAT &
+   current_size <= SIZE &
+   cursor < current_size &
+   order_i: 0..(SIZE -1) --> STATE &
+   size(order) = current_size &
+   order = %kk . (kk : 1..current_size | order_i((cursor + kk - 1 mod current_size)))
+   
+INITIALISATION
+   BEGIN
+      cursor := 0;
+      current_size := 0;
+      order_i := (0..(SIZE-1)) * {NS}
+   END
+ 
+      
+OPERATIONS
+   
+   insert(ss) =
+      BEGIN
+          current_size := current_size + 1;
+          order_i(current_size) := ss
+      END;
+      
+   ss <-- current =
+      BEGIN
+         ss := order_i(cursor)   
+      END;
+      
+   ss <-- next =
+     BEGIN
+         ss := order_i(cursor + 1)   
+      END;
+   
+   ss <-- advance =
+      BEGIN
+          ss := order_i(cursor);
+          VAR ii IN
+              ii := current_size - 1;
+              IF cursor = ii THEN
+                  cursor := 0
+              ELSE
+                  cursor := cursor + 1
+              END
+          END
+      END
+ END

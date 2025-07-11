@@ -39,10 +39,10 @@ CONCRETE_VARIABLES
   cars_i,
   time_i,
   semaphores_i,
-  has_priority_i,
-  priority_i,
-  timer_i,
-  yellow_timer_i
+  has_priority,
+  priority,
+  timer,
+  yellow_timer
   
 INVARIANT
 
@@ -53,21 +53,7 @@ INVARIANT
   time = (time_enum~;time_i) &
   
   semaphores_i : 0..11 --> 0..2 &
-  semaphores = (semaphore_enum~; semaphores_i; color_enum) &
-  
-  // Já concretas
-  has_priority_i : BOOL &
-  has_priority = has_priority_i &
-  
-  priority_i : STATE &
-  priority = priority_i &
-  
-  timer_i : 0..max_time &
-  timer = timer_i &
-  
-  yellow_timer_i : 0..yellow_time &
-  yellow_timer = yellow_timer_i
-  
+  semaphores = (semaphore_enum~; semaphores_i; color_enum)
       
 INITIALISATION
     BEGIN
@@ -76,21 +62,36 @@ INITIALISATION
        semaphores_i := (0..11) * {2}; // Todos vermelhos
        semaphores_i(7) := 0; //  LO_A como verde
        semaphores_i(10) := 0; // OL_A como verde
-       has_priority_i := FALSE;
-       priority_i := NS;
-       timer_i := max_time;
-       yellow_timer_i := yellow_time
+       has_priority := FALSE;
+       priority := NS;
+       timer := max_time;
+       yellow_timer := yellow_time
     END
   
 OPERATIONS
     prioritize (ss) =
-        skip;
+        BEGIN
+            has_priority := TRUE;
+            priority := ss;
+            timer := max_time
+        END;
 
    calculate_times = 
        skip;
 
    addCars(nn,dd) = 
-        skip;
+        BEGIN
+              IF dd = NORTH THEN
+                 cars_i(0) := cars_i(0) + nn
+              ELSIF dd = SOUTH THEN
+                 cars_i(1) := cars_i(1) + nn
+              ELSIF dd = EAST THEN
+                 cars_i(2) := cars_i(2) + nn
+              ELSE
+                 cars_i(3) := cars_i(3) + nn
+              END
+              
+        END;
 
 
     st, yt <-- process_semaphore =
@@ -102,16 +103,56 @@ OPERATIONS
 
  
      ll, aa, rr <-- status_semaphoreNS = 
-       skip;
+       BEGIN
+          VAR ll_c, aa_c, rr_c IN 
+              ll_c := semaphores_i(0);
+              aa_c := semaphores_i(1);
+              rr_c := semaphores_i(2);
+              
+              ll := color_enum(ll_c);
+              aa := color_enum(aa_c);
+              rr := color_enum(rr_c)
+          END
+       END;
 
     
      ll, aa, rr <-- status_semaphoreSN = 
-       skip;
+        BEGIN
+          VAR ll_c, aa_c, rr_c IN 
+              ll_c := semaphores_i(3);
+              aa_c := semaphores_i(4);
+              rr_c := semaphores_i(5);
+              
+              ll := color_enum(ll_c);
+              aa := color_enum(aa_c);
+              rr := color_enum(rr_c)
+          END
+       END;
 
     
      ll, aa, rr <-- status_semaphoreLO = 
-        skip;
+       BEGIN
+          VAR ll_c, aa_c, rr_c IN 
+              ll_c := semaphores_i(6);
+              aa_c := semaphores_i(7);
+              rr_c := semaphores_i(8);
+              
+              ll := color_enum(ll_c);
+              aa := color_enum(aa_c);
+              rr := color_enum(rr_c)
+          END
+       END;
 
      ll, aa, rr <-- status_semaphoreOL = 
-       skip
+       BEGIN
+          VAR ll_c, aa_c, rr_c IN 
+              ll_c := semaphores_i(9);
+              aa_c := semaphores_i(10);
+              rr_c := semaphores_i(11);
+              
+              ll := color_enum(ll_c);
+              aa := color_enum(aa_c);
+              rr := color_enum(rr_c)
+          END
+       END
  END
