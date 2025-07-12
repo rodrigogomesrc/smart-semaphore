@@ -15,7 +15,8 @@ SETS
      };
      COLOR = {GREEN,YELLOW,RED};
      DIRECTION = {NORTH, SOUTH, EAST, WEST};
-     STATE = {NS, LO, DNS, DLO} // Norte-Sul, Leste-Oeste, Diagonal Norte-Sul, Diagonal Leste-Oeste
+     STATE = {NS, LO, DNS, DLO}; // Norte-Sul, Leste-Oeste, Diagonal Norte-Sul, Diagonal Leste-Oeste
+     PRIORITY_PHASE = {TRANSITIONING, ACTIVE, EXITING}
      
 CONSTANTS
 
