@@ -26,10 +26,10 @@ CONSTANTS
     
 PROPERTIES
 
-     min_time: 2..10  & 
-     max_time: 0..10 & 
-     max_cars: 0..10 &
+     min_time: 2..20  & 
+     max_time: 3..60 & 
+     max_cars: 5..100 &
      max_time > min_time &
-     yellow_time: 0..5 
+     yellow_time: 0..50 
 
 END

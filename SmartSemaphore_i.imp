@@ -7,7 +7,11 @@ IMPLEMENTATION SmartSemaphore_i
       
 REFINES SmartSemaphore
       
-SEES SmartSemaphore_ctx
+SEES 
+      SmartSemaphore_ctx
+      
+IMPORTS 
+      Priority
       
 CONCRETE_CONSTANTS
   direction_enum,
@@ -65,7 +69,14 @@ INITIALISATION
        has_priority := FALSE;
        priority := NS;
        timer := max_time;
-       yellow_timer := yellow_time
+       yellow_timer := yellow_time;
+       
+       //Inicializa máquina Priority
+       insert(LO);
+       insert(NS);
+       insert(DNS);
+       insert(DLO)
+       
     END
   
 OPERATIONS
@@ -76,8 +87,64 @@ OPERATIONS
             timer := max_time
         END;
 
-   calculate_times = 
-       skip;
+   calculate_times =
+    BEGIN
+        VAR sumNS, sumLO, max_denominator, timeNS, timeLO, timeDNS, timeDLO IN
+            sumNS := cars_i(0) + cars_i(1); // NORTH + SOUTH
+            sumLO := cars_i(2) + cars_i(3); // EAST + WEST
+
+            IF sumNS > sumLO THEN
+                max_denominator := sumNS
+            ELSE
+                max_denominator := sumLO
+            END;
+
+          
+            IF max_denominator /= 0 THEN 
+               
+                VAR tempTimeNS_DNS IN
+                    tempTimeNS_DNS := (sumNS * max_time) / max_denominator;
+                    
+                    IF tempTimeNS_DNS > min_time THEN
+                        timeNS := tempTimeNS_DNS;
+                        timeDNS := tempTimeNS_DNS
+                    ELSE
+                        timeNS := min_time;
+                        timeDNS := min_time
+                    END
+                END;
+
+             
+                VAR tempTimeLO_DLO IN
+                    tempTimeLO_DLO := (sumLO * max_time) / max_denominator;
+     
+                    IF tempTimeLO_DLO > min_time THEN
+                        timeLO := tempTimeLO_DLO;
+                        timeDLO := tempTimeLO_DLO
+                    ELSE
+                        timeLO := min_time;
+                        timeDLO := min_time
+                    END
+                END
+            ELSE
+                // Caso o max_denominator seja 0
+                timeNS := min_time;
+                timeDNS := min_time;
+                timeLO := min_time;
+                timeDLO := min_time
+            END;
+
+          
+            time_i(0) := timeNS;
+            time_i(1) := timeLO; 
+            time_i(2) := timeDNS;
+            time_i(3) := timeDLO; 
+            cars_i(0) := 0; 
+            cars_i(1) := 0; 
+            cars_i(2) := 0;
+            cars_i(3) := 0 
+        END
+    END;
 
    addCars(nn,dd) = 
         BEGIN
@@ -90,16 +157,132 @@ OPERATIONS
               ELSE
                  cars_i(3) := cars_i(3) + nn
               END
-              
         END;
 
 
     st, yt <-- process_semaphore =
-        skip;
+        BEGIN
+            IF timer > 0 THEN 
+                timer := timer - 1; 
+                st := timer -1;
+                yt := yellow_timer
+            ELSIF (timer = 0 & yellow_timer > 0) THEN
+                VAR current_state IN
+                    current_state <-- current; 
+                    IF current_state = LO THEN
+                        semaphores_i := (0..11) * {2}; 
+                        semaphores_i(7) := 1; semaphores_i(10) := 1
+                    ELSIF current_state = DNS THEN
+                        semaphores_i := (0..11) * {2};
+                        semaphores_i(3) := 1; semaphores_i(5) := 1; semaphores_i(0) := 1;
+                        semaphores_i(2) := 1; semaphores_i(11) := 1; semaphores_i(8) := 1
+                    ELSIF current_state = DLO THEN
+                        semaphores_i := (0..11) * {2};
+                        semaphores_i(5) := 1; semaphores_i(2) := 1; semaphores_i(11) := 1;
+                        semaphores_i(9) := 1; semaphores_i(8) := 1; semaphores_i(6) := 1
+                    ELSE
+                        semaphores_i := (0..11) * {2};
+                        semaphores_i(1) := 1; semaphores_i(4) := 1
+                    END ;
+                    yellow_timer := yellow_timer - 1;
+                    st := timer;
+                    yt := yellow_timer - 1
+                END
+            ELSE
+                VAR next_state, ss IN
+                    ss <-- advance; 
+                    next_state <-- current; 
+                    
+                    IF next_state = NS THEN timer := time_i(0)
+                    ELSIF next_state = LO THEN timer := time_i(1)
+                    ELSIF next_state = DNS THEN timer := time_i(2)
+                    ELSE timer := time_i(3) END;
+                    
+                    IF next_state = LO THEN
+                        semaphores_i := (0..11) * {2};
+                        semaphores_i(7) := 0; semaphores_i(10) := 0
+                    ELSIF next_state = DNS THEN
+                        semaphores_i := (0..11) * {2};
+                        semaphores_i(3) := 0; semaphores_i(5) := 0; semaphores_i(0) := 0;
+                        semaphores_i(2) := 0; semaphores_i(11) := 0; semaphores_i(8) := 0
+                    ELSIF next_state = DLO THEN
+                        semaphores_i := (0..11) * {2};
+                        semaphores_i(5) := 0; semaphores_i(2) := 0; semaphores_i(11) := 0;
+                        semaphores_i(9) := 0; semaphores_i(8) := 0; semaphores_i(6) := 0
+                    ELSE
+                        semaphores_i := (0..11) * {2};
+                        semaphores_i(1) := 0; semaphores_i(4) := 0
+                    END;
+                    yt := yellow_timer;
+                    st := timer;
+                    yellow_timer := yellow_time
+                END
+            END
+        END;
 
 
      st, yt <-- process_semaphore_priority =
-       skip;
+    BEGIN
+        IF timer > 0 THEN 
+            timer := timer - 1; 
+            st := timer - 1;
+            yt := yellow_timer
+
+        ELSIF (timer = 0 & yellow_timer > 0) THEN
+            VAR current_state IN
+                current_state <-- current;
+                semaphores_i := (0..11) * {2};
+                IF current_state = LO THEN
+                    semaphores_i(7) := 1; semaphores_i(10) := 1
+                ELSIF current_state = DNS THEN
+                    semaphores_i(3) := 1; semaphores_i(5) := 1;
+                    semaphores_i(0) := 1; semaphores_i(2) := 1;
+                    semaphores_i(11) := 1; semaphores_i(8) := 1
+                ELSIF current_state = DLO THEN
+                    semaphores_i(5) := 1; semaphores_i(2) := 1;
+                    semaphores_i(11) := 1; semaphores_i(9) := 1;
+                    semaphores_i(8) := 1; semaphores_i(6) := 1
+                ELSE
+                    semaphores_i(1) := 1; semaphores_i(4) := 1
+                END;
+                yellow_timer := yellow_timer - 1;
+                st := timer;
+                yt := yellow_timer - 1
+            END
+
+        ELSE
+            VAR next_state, ss IN
+               
+                ss <-- advance;  
+                next_state <-- current; 
+
+                IF next_state = NS  THEN timer := time_i(0)
+                ELSIF next_state = LO  THEN timer := time_i(1)
+                ELSIF next_state = DNS THEN timer := time_i(2)
+                ELSE timer := time_i(3)
+                END;
+
+                semaphores_i := (0..11) * {2};
+                IF next_state = LO THEN
+                    semaphores_i(7):= 0; semaphores_i(10) := 0
+                ELSIF next_state = DNS THEN
+                    semaphores_i(3):= 0; semaphores_i(5)  := 0;
+                    semaphores_i(0):= 0; semaphores_i(2)  := 0;
+                    semaphores_i(11):= 0; semaphores_i(8)  := 0
+                ELSIF next_state = DLO THEN
+                    semaphores_i(5):= 0; semaphores_i(2)  := 0;
+                    semaphores_i(11):= 0; semaphores_i(9)  := 0;
+                    semaphores_i(8):= 0; semaphores_i(6)  := 0
+                ELSE
+                    semaphores_i(1):= 0; semaphores_i(4) := 0
+                END;
+                yt := yellow_timer;
+                st := timer;
+                yellow_timer := yellow_time;
+                has_priority := FALSE
+            END
+        END
+    END;
 
  
      ll, aa, rr <-- status_semaphoreNS = 
