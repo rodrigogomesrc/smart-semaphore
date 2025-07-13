@@ -90,6 +90,12 @@ OPERATIONS
             yellow_timer := yellow_time ||
             priority_phase := TRANSITIONING 
         END;
+        
+   status <-- pre_op_prioritize(ss) =
+      PRE ss: STATE
+      THEN   
+            status := bool(has_priority = FALSE & first(order) /= ss)
+      END;
 
    calculate_times = 
        // Previne divisão por 0
@@ -102,12 +108,21 @@ OPERATIONS
             cars := DIRECTION * {0}
           
        END;
+       
+   status <-- pre_calculate_times =
+        PRE 1=1
+        THEN status := TRUE
+        END;
 
    addCars(nn,dd) = 
         PRE nn : NAT & dd : DIRECTION & cars(dd) + nn < max_cars
         THEN cars(dd) := cars(dd) + nn
         END;
 
+   status <-- pre_op_addCars(nn,dd) =
+       PRE nn : NAT & dd : DIRECTION
+       THEN status := bool(cars(dd) + nn < max_cars)
+       END;
    
     st, yt <-- process_semaphore =
         PRE has_priority = FALSE
@@ -149,6 +164,11 @@ OPERATIONS
                 yt := yellow_timer || st := time(order(2)) || yellow_timer := yellow_time
             END 
          END;
+         
+     status <-- pre_op_process_semaphore =
+       PRE 1=1
+       THEN status := bool(has_priority = FALSE)
+       END;
 
      st, yt <-- process_semaphore_priority =
           PRE has_priority = TRUE
@@ -244,6 +264,11 @@ OPERATIONS
                   END
               END
       END;
+      
+     status <-- pre_op_process_semaphore_priority =
+       PRE 1 = 1
+       THEN status := bool(has_priority = TRUE)
+       END;
  
      ll, aa, rr <-- status_semaphoreNS = 
        BEGIN
@@ -264,6 +289,7 @@ OPERATIONS
         BEGIN
            ll := semaphores(OL_L) ||  aa := semaphores(OL_A) ||  rr := semaphores(OL_R)
        END
+
 
 END
 

@@ -88,6 +88,15 @@ OPERATIONS
             priority := ss;
             timer := max_time
         END;
+    
+   status <-- pre_op_prioritize(ss) =
+      BEGIN
+         VAR cc IN
+            cc <-- current;
+            status := bool(has_priority = FALSE & cc /= ss)   
+         END
+        
+      END;
 
    calculate_times =
     BEGIN
@@ -147,6 +156,11 @@ OPERATIONS
             cars_i(3) := 0 
         END
     END;
+    
+    status <-- pre_calculate_times =
+      BEGIN
+            status := TRUE
+      END;
 
    addCars(nn,dd) = 
         BEGIN
@@ -160,6 +174,24 @@ OPERATIONS
                  cars_i(3) := cars_i(3) + nn
               END
         END;
+        
+    status <-- pre_op_addCars(nn,dd) =
+       BEGIN
+             VAR ii, jj IN
+                   
+                   IF dd = NORTH THEN
+                       ii := cars_i(0)
+                    ELSIF dd = SOUTH THEN
+                        ii := cars_i(1)
+                    ELSIF dd = EAST THEN
+                        ii := cars_i(2)
+                    ELSE
+                        ii := cars_i(3)
+                    END;
+                    jj := ii + nn;
+                    status := bool(jj < max_cars)
+              END
+       END;
 
 
     st, yt <-- process_semaphore =
@@ -221,6 +253,11 @@ OPERATIONS
                 END
             END
         END;
+        
+     status <-- pre_op_process_semaphore =
+       BEGIN
+             status := bool(has_priority = FALSE)
+       END;
 
      st, yt <-- process_semaphore_priority =
      BEGIN
@@ -328,6 +365,11 @@ OPERATIONS
              END
          END
      END;
+     
+     status <-- pre_op_process_semaphore_priority =
+       BEGIN
+            status := has_priority
+       END;
 
  
      ll, aa, rr <-- status_semaphoreNS = 
@@ -383,4 +425,5 @@ OPERATIONS
               rr := color_enum(rr_c)
           END
        END
+ 
  END

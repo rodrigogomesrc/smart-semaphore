@@ -9,9 +9,12 @@ REFINES Priority
       
 SEES
   SmartSemaphore_ctx
+  
 
 VALUES
-  SIZE = 5
+  SIZE = 5;
+  BOUND = 4
+
   
 CONCRETE_VARIABLES
    cursor,
@@ -19,11 +22,11 @@ CONCRETE_VARIABLES
    order_i
    
 INVARIANT
-   cursor: 0..(SIZE -1) &
+   cursor: 0..BOUND &
    current_size : NAT &
    current_size <= SIZE &
-   cursor < current_size &
-   order_i: 0..(SIZE -1) --> STATE &
+   cursor <= current_size &
+   order_i: 0..BOUND --> STATE &
    size(order) = current_size &
    order = %kk . (kk : 1..current_size | order_i((cursor + kk - 1 mod current_size)))
    
@@ -31,7 +34,7 @@ INITIALISATION
    BEGIN
       cursor := 0;
       current_size := 0;
-      order_i := (0..(SIZE-1)) * {NS}
+      order_i := (0..BOUND) * {NS}
    END
  
       

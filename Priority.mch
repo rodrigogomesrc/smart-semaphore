@@ -9,11 +9,14 @@ SEES
      SmartSemaphore_ctx
      
 CONSTANTS
-   SIZE
+   SIZE,
+   BOUND
    
 PROPERTIES
-   SIZE = 4
-     
+   SIZE: NAT1 &
+   BOUND: NAT1 &
+   BOUND = SIZE -1
+
 VARIABLES
   order
   
