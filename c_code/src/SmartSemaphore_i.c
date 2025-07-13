@@ -56,10 +56,6 @@ void SmartSemaphore__INITIALISATION(void)
         SmartSemaphore__timer = SmartSemaphore_ctx__max_time;
         SmartSemaphore__yellow_timer = SmartSemaphore_ctx__yellow_time;
         SmartSemaphore__priority_phase = SmartSemaphore_ctx__TRANSITIONING;
-        Priority__insert(SmartSemaphore_ctx__LO);
-        Priority__insert(SmartSemaphore_ctx__NS);
-        Priority__insert(SmartSemaphore_ctx__DNS);
-        Priority__insert(SmartSemaphore_ctx__DLO);
     }
 }
 
@@ -213,7 +209,7 @@ void SmartSemaphore__process_semaphore(int32_t *st, int32_t *yt)
         if((SmartSemaphore__timer) > (0))
         {
             SmartSemaphore__timer = SmartSemaphore__timer-1;
-            (*st) = SmartSemaphore__timer-1;
+            (*st) = SmartSemaphore__timer;
             (*yt) = SmartSemaphore__yellow_timer;
         }
         else if(((SmartSemaphore__timer == 0) &&
@@ -264,12 +260,12 @@ void SmartSemaphore__process_semaphore(int32_t *st, int32_t *yt)
                     {
                         SmartSemaphore__semaphores_i[i] = 2;
                     }
-                    SmartSemaphore__semaphores_i[1] = 1;
-                    SmartSemaphore__semaphores_i[4] = 1;
+                    SmartSemaphore__semaphores_i[7] = 1;
+                    SmartSemaphore__semaphores_i[10] = 1;
                 }
                 SmartSemaphore__yellow_timer = SmartSemaphore__yellow_timer-1;
                 (*st) = SmartSemaphore__timer;
-                (*yt) = SmartSemaphore__yellow_timer-1;
+                (*yt) = SmartSemaphore__yellow_timer;
             }
         }
         else
@@ -340,9 +336,9 @@ void SmartSemaphore__process_semaphore(int32_t *st, int32_t *yt)
                     SmartSemaphore__semaphores_i[1] = 0;
                     SmartSemaphore__semaphores_i[4] = 0;
                 }
+                SmartSemaphore__yellow_timer = SmartSemaphore_ctx__yellow_time;
                 (*yt) = SmartSemaphore__yellow_timer;
                 (*st) = SmartSemaphore__timer;
-                SmartSemaphore__yellow_timer = SmartSemaphore_ctx__yellow_time;
             }
         }
     }
@@ -363,7 +359,7 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
             {
                 SmartSemaphore__yellow_timer = SmartSemaphore__yellow_timer-1;
                 (*st) = SmartSemaphore__timer;
-                (*yt) = SmartSemaphore__yellow_timer-1;
+                (*yt) = SmartSemaphore__yellow_timer;
                 if(SmartSemaphore__yellow_timer == SmartSemaphore_ctx__yellow_time)
                 {
                     for(i = 0; i <= 11;i++)
@@ -399,8 +395,8 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
                         }
                         else
                         {
-                            SmartSemaphore__semaphores_i[1] = 1;
-                            SmartSemaphore__semaphores_i[4] = 1;
+                            SmartSemaphore__semaphores_i[7] = 1;
+                            SmartSemaphore__semaphores_i[10] = 1;
                         }
                     }
                 }
@@ -410,7 +406,7 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
                 SmartSemaphore__priority_phase = SmartSemaphore_ctx__ACTIVE;
                 SmartSemaphore__yellow_timer = SmartSemaphore_ctx__yellow_time;
                 (*st) = SmartSemaphore__timer;
-                (*yt) = SmartSemaphore_ctx__yellow_time;
+                (*yt) = SmartSemaphore__yellow_timer;
             }
         }
         else if(SmartSemaphore__priority_phase == SmartSemaphore_ctx__ACTIVE)
@@ -502,8 +498,8 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
                     }
                     else
                     {
-                        SmartSemaphore__semaphores_i[1] = 1;
-                        SmartSemaphore__semaphores_i[4] = 1;
+                        SmartSemaphore__semaphores_i[7] = 1;
+                        SmartSemaphore__semaphores_i[10] = 1;
                     }
                 }
             }
@@ -570,7 +566,7 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
                     }
                 }
                 (*st) = SmartSemaphore__timer;
-                (*yt) = SmartSemaphore_ctx__yellow_time;
+                (*yt) = SmartSemaphore__yellow_timer;
             }
         }
     }

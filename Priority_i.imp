@@ -4,68 +4,49 @@
  */
 
 IMPLEMENTATION Priority_i
-      
+
 REFINES Priority
       
 SEES
-  SmartSemaphore_ctx
-  
-
+    SmartSemaphore_ctx
+    
 VALUES
-  SIZE = 5;
-  BOUND = 4
 
-  
+    SIZE = 4;
+    BOUND = 3
+
 CONCRETE_VARIABLES
-   cursor,
-   current_size,
-   order_i
-   
+    cursor,
+    order_i
+
 INVARIANT
-   cursor: 0..BOUND &
-   current_size : NAT &
-   current_size <= SIZE &
-   cursor <= current_size &
-   order_i: 0..BOUND --> STATE &
-   size(order) = current_size &
-   order = %kk . (kk : 1..current_size | order_i((cursor + kk - 1 mod current_size)))
-   
+    cursor: 0..BOUND &
+    order_i: 0..3 --> STATE &
+    order = %kk . (kk : 1..SIZE | order_i((cursor + kk - 1) mod SIZE)) &
+    dom(order_i) = 0..BOUND
+
 INITIALISATION
-   BEGIN
-      cursor := 0;
-      current_size := 0;
-      order_i := (0..BOUND) * {NS}
-   END
- 
-      
+    BEGIN
+        cursor := 0;
+        order_i := {0 |-> NS, 1 |-> LO, 2 |-> DNS, 3 |-> DLO}
+       
+    END
+
 OPERATIONS
-   
-   insert(ss) =
-      BEGIN
-          current_size := current_size + 1;
-          order_i(current_size) := ss
-      END;
-      
-   ss <-- current =
-      BEGIN
-         ss := order_i(cursor)   
-      END;
-      
-   ss <-- next =
-     BEGIN
-         ss := order_i(cursor + 1)   
-      END;
-   
-   ss <-- advance =
-      BEGIN
-          ss := order_i(cursor);
-          VAR ii IN
-              ii := current_size - 1;
-              IF cursor = ii THEN
-                  cursor := 0
-              ELSE
-                  cursor := cursor + 1
-              END
-          END
-      END
- END
+
+    ss <-- current =
+    BEGIN
+        ss := order_i(cursor)
+    END;
+
+    ss <-- next =
+    BEGIN
+        ss := order_i((cursor + 1) mod SIZE)
+    END;
+
+    ss <-- advance =
+    BEGIN
+        ss := order_i(cursor);
+        cursor := (cursor + 1) mod SIZE
+    END
+END

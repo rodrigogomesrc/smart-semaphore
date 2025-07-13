@@ -6,52 +6,48 @@ MACHINE
       Priority
       
 SEES
-     SmartSemaphore_ctx
-     
+    SmartSemaphore_ctx
+    
 CONSTANTS
-   SIZE,
-   BOUND
-   
+      
+    SIZE, 
+    BOUND
+    
 PROPERTIES
-   SIZE: NAT1 &
-   BOUND: NAT1 &
-   BOUND = SIZE -1
+    SIZE: NAT1 
+    & SIZE = 4 
+    & BOUND: NAT1 
+    & BOUND = 3
 
 VARIABLES
-  order
-  
-INVARIANT
-  order: seq(STATE) &
-  size(order) <= SIZE
-  
-INITIALISATION
-   order := <>
-  
-OPERATIONS
-      
-   insert(ss) =
-   PRE ss:STATE & size(order) < SIZE
-   THEN     
-         order := order <- ss
-   END;
-   
-   ss <-- current = 
-   PRE size(order) >= 1 
-   THEN
-         ss := order(1)
-   END;
-   
-   ss <-- next = 
-   PRE size(order) > 1 
-   THEN
-         ss := order(2)
-   END;
-   
-   ss <-- advance =
-   PRE size(order) > 1 
-   THEN
-         ss := order(1) || order := order \|/ 1 ^ [order(1)]
-   END
-      
+    order
 
+INVARIANT
+      
+    order: seq(STATE) &
+    size(order) = SIZE  
+
+INITIALISATION
+    order := [NS, LO, DNS, DLO]
+
+OPERATIONS
+ 
+    ss <-- current =
+    PRE 1=1 
+    THEN
+        ss := order(1)
+    END;
+
+    ss <-- next =
+    PRE 1 = 1
+    THEN
+        ss := order(2)
+    END;
+
+    ss <-- advance =
+    PRE 1=1 
+    THEN
+        ss := order(1) ||
+        order := (tail(order) <- order(1))
+    END
 END

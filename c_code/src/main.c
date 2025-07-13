@@ -67,7 +67,7 @@ int main()
             SmartSemaphore__pre_op_prioritize(SmartSemaphore_ctx__NS, &can_prio_test);
             if (can_prio_test)
             {
-                is_priority_mode_active = false;
+                is_priority_mode_active = true;
             }
             else
             {
@@ -114,7 +114,7 @@ int main()
         printf(" Modo: %-10s | T. Verde: %-3ds | T. Amarelo: %-3ds | Estado: %s\n", is_priority_mode_active ? "PRIORIDADE" : "NORMAL", st, yt, estado_string);
         printf("-----------------------------------------------------------------\n\n");
         
-        printf("ESTADO DOS SEMÁFOROS:\n");
+        printf("ESTADO DOS SEMAFOROS:\n");
         printf(" Norte -> [LEFT, AHEAD, RIGHT] = [%-6s, %-6s, %-6s]\n", color_to_string(ns_l), color_to_string(ns_a), color_to_string(ns_r));
         printf(" Sul   -> [LEFT, AHEAD, RIGHT] = [%-6s, %-6s, %-6s]\n", color_to_string(sn_l), color_to_string(sn_a), color_to_string(sn_r));
         printf(" Leste -> [LEFT, AHEAD, RIGHT] = [%-6s, %-6s, %-6s]\n", color_to_string(lo_l), color_to_string(lo_a), color_to_string(lo_r));
@@ -122,7 +122,7 @@ int main()
 
         printf("-----------------------------------------------------------------\n");
         printf("COMANDOS:\n");
-        printf(" > add <num> <dir> (direções: north, south, east, west | ex: add 10 north)\n");
+        printf(" > add <num> <dir> (direcoes: north, south, east, west | ex: add 10 north)\n");
         
         if (!is_priority_mode_active)
         {
@@ -137,7 +137,7 @@ int main()
         }
 
         printf(" > quit\n\n");
-        printf("Pressione ENTER para o próximo ciclo ou digite um comando:\n> ");
+        printf("Pressione ENTER para o proximo ciclo ou digite um comando:\n> ");
 
 
         if (fgets(command_buffer, sizeof(command_buffer), stdin) != NULL)
@@ -182,6 +182,9 @@ int main()
                     else if (strcmp(arg1, "dlo") == 0)
                     {
                         priority_state = SmartSemaphore_ctx__DLO;
+                    } else if (strcmp(arg1, "ns") != 0)
+                    {
+                        priority_state = SmartSemaphore_ctx__NS;
                     }
 
                     bool allow_priority;
@@ -203,6 +206,6 @@ int main()
         }
     }
 
-    printf("\nSimulação encerrada.\n");
+    printf("\nSimulacao encerrada.\n");
     return 0;
 }
