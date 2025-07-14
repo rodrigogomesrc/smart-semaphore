@@ -42,6 +42,8 @@ int main()
     while (running)
     {
 
+        clear_screen();
+
         bool can_run_priority;
         SmartSemaphore__pre_op_process_semaphore_priority(&can_run_priority);
         if (can_run_priority)
@@ -53,7 +55,6 @@ int main()
             SmartSemaphore__process_semaphore(&st, &yt);
         }
         
-        clear_screen();
 
         SmartSemaphore_ctx__COLOR ns_l, ns_a, ns_r, sn_l, sn_a, sn_r, lo_l, lo_a, lo_r, ol_l, ol_a, ol_r;
         SmartSemaphore__status_semaphoreNS(&ns_l, &ns_a, &ns_r);
@@ -111,7 +112,8 @@ int main()
         
 
         printf("=========================== CICLO ATUAL ===========================\n");
-        printf(" Modo: %-10s | T. Verde: %-3ds | T. Amarelo: %-3ds | Estado: %s\n", is_priority_mode_active ? "PRIORIDADE" : "NORMAL", st, yt, estado_string);
+        printf(" Modo: %-10s | T. Verde: %-3ds | T. Amarelo: %-3ds | Estado: %s\n", can_run_priority ? "PRIORIDADE" : "NORMAL", st, yt, estado_string);
+        //printf(" T. Verde: %-3ds | T. Amarelo: %-3ds | Estado: %s\n", st, yt, estado_string);
         printf("-----------------------------------------------------------------\n\n");
         
         printf("ESTADO DOS SEMAFOROS:\n");

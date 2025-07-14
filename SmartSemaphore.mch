@@ -179,19 +179,17 @@ OPERATIONS
                       yellow_timer := yellow_timer - 1 ||
                       st := timer ||
                       yt := yellow_timer - 1 ||
-                      IF yellow_timer = yellow_time THEN
-                        IF first(order) = LO THEN 
-                              semaphores := semaphores <+ {LO_A |-> YELLOW, OL_A |-> YELLOW}
-                        ELSIF first(order) = DNS THEN 
-                              semaphores := semaphores <+ {SN_L |-> YELLOW, SN_R |-> YELLOW, 
-                                    NS_L |-> YELLOW, NS_R |-> YELLOW, OL_R |-> YELLOW, LO_R |-> YELLOW}
-                        ELSIF first(order) = DLO THEN 
-                              semaphores := semaphores <+ {SN_R |-> YELLOW, NS_R |-> YELLOW, 
-                                   OL_R |-> YELLOW, OL_L |-> YELLOW, LO_R |-> YELLOW, LO_L |-> YELLOW}
-                        ELSE 
-                              semaphores := semaphores <+ {NS_A |-> YELLOW, SN_A |-> YELLOW}
-                        END
-                      END
+                      IF first(order) = LO THEN 
+                        semaphores := semaphores <+ {LO_A |-> YELLOW, OL_A |-> YELLOW}
+                      ELSIF first(order) = DNS THEN 
+                        semaphores := semaphores <+ {SN_L |-> YELLOW, SN_R |-> YELLOW, 
+                              NS_L |-> YELLOW, NS_R |-> YELLOW, OL_R |-> YELLOW, LO_R |-> YELLOW}
+                      ELSIF first(order) = DLO THEN 
+                        semaphores := semaphores <+ {SN_R |-> YELLOW, NS_R |-> YELLOW, 
+                             OL_R |-> YELLOW, OL_L |-> YELLOW, LO_R |-> YELLOW, LO_L |-> YELLOW}
+                      ELSE 
+                        semaphores := semaphores <+ {NS_A |-> YELLOW, SN_A |-> YELLOW}
+                  END
                   ELSE
                       priority_phase := ACTIVE ||
                       yellow_timer := yellow_time ||
@@ -201,23 +199,21 @@ OPERATIONS
       
               ELSIF priority_phase = ACTIVE THEN
                   //  FASE 2: Verde para o estado prioritário
-                  IF timer > 1 THEN
+                  IF timer > 0 THEN
                       timer := timer - 1 ||
                       st := timer - 1 ||
                       yt := 0 ||
-                      IF timer = max_time THEN
-                        IF priority = LO THEN 
-                               semaphores := (SEMAPHORE * {RED}) <+ {LO_A |-> GREEN, OL_A |-> GREEN}
-                        ELSIF priority = DNS THEN 
-                               semaphores := (SEMAPHORE * {RED}) <+ {SN_L |-> GREEN, SN_R |-> GREEN, 
-                                     NS_L |-> GREEN, NS_R |-> GREEN, OL_R |-> GREEN, LO_R |-> GREEN}
-                        ELSIF priority = DLO THEN 
-                               semaphores := (SEMAPHORE * {RED}) <+ {SN_R |-> GREEN, NS_R |-> GREEN, 
-                                     OL_R |-> GREEN, OL_L |-> GREEN, LO_R |-> GREEN, LO_L |-> GREEN}
-                        ELSE 
-                               semaphores := (SEMAPHORE * {RED}) <+ {NS_A |-> GREEN, SN_A |-> GREEN}
-                        END
-                      END
+                      IF priority = LO THEN 
+                         semaphores := (SEMAPHORE * {RED}) <+ {LO_A |-> GREEN, OL_A |-> GREEN}
+                      ELSIF priority = DNS THEN 
+                         semaphores := (SEMAPHORE * {RED}) <+ {SN_L |-> GREEN, SN_R |-> GREEN, 
+                               NS_L |-> GREEN, NS_R |-> GREEN, OL_R |-> GREEN, LO_R |-> GREEN}
+                      ELSIF priority = DLO THEN 
+                         semaphores := (SEMAPHORE * {RED}) <+ {SN_R |-> GREEN, NS_R |-> GREEN, 
+                               OL_R |-> GREEN, OL_L |-> GREEN, LO_R |-> GREEN, LO_L |-> GREEN}
+                      ELSE 
+                         semaphores := (SEMAPHORE * {RED}) <+ {NS_A |-> GREEN, SN_A |-> GREEN}
+                  END
                   ELSE  
                       priority_phase := EXITING ||
                       timer := 0 ||
@@ -231,18 +227,16 @@ OPERATIONS
                       yellow_timer := yellow_timer - 1 ||
                       st := 0 ||
                       yt := yellow_timer - 1 ||
-                      IF yellow_timer = yellow_time THEN
-                        IF priority = LO THEN   
+                      IF priority = LO THEN   
                               semaphores := semaphores <+ {LO_A |-> YELLOW, OL_A |-> YELLOW}
-                        ELSIF priority = DNS THEN 
+                      ELSIF priority = DNS THEN 
                               semaphores := semaphores <+ {SN_L |-> YELLOW, SN_R |-> YELLOW, NS_L |-> YELLOW, 
                                      NS_R |-> YELLOW, OL_R |-> YELLOW, LO_R |-> YELLOW}
-                        ELSIF priority = DLO THEN  
+                      ELSIF priority = DLO THEN  
                               semaphores := semaphores <+ {SN_R |-> YELLOW, NS_R |-> YELLOW, OL_R |-> YELLOW, 
                                     OL_L |-> YELLOW, LO_R |-> YELLOW, LO_L |-> YELLOW}
-                        ELSE 
+                      ELSE 
                               semaphores := semaphores <+  {NS_A |-> YELLOW, SN_A |-> YELLOW}
-                        END
                       END
                   ELSE   //  FASE 4: Volta para o estado interrompido
                       has_priority := FALSE ||

@@ -1,5 +1,5 @@
 /* WARNING if type checker is not performed, translation could contain errors ! */
-
+#include <stdio.h>
 #include "SmartSemaphore.h"
 
 /* Clause SEES */
@@ -66,6 +66,7 @@ void SmartSemaphore__prioritize(SmartSemaphore_ctx__STATE ss)
     SmartSemaphore__has_priority = true;
     SmartSemaphore__priority = ss;
     SmartSemaphore__timer = SmartSemaphore_ctx__max_time;
+    SmartSemaphore__yellow_timer = SmartSemaphore_ctx__yellow_time;
 }
 
 void SmartSemaphore__pre_op_prioritize(SmartSemaphore_ctx__STATE ss, bool *status)
@@ -355,50 +356,46 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
     {
         if(SmartSemaphore__priority_phase == SmartSemaphore_ctx__TRANSITIONING)
         {
-            if((SmartSemaphore__yellow_timer) > (1))
+            if((SmartSemaphore__yellow_timer) > (0))
             {
                 SmartSemaphore__yellow_timer = SmartSemaphore__yellow_timer-1;
                 (*st) = SmartSemaphore__timer;
                 (*yt) = SmartSemaphore__yellow_timer;
-                if(SmartSemaphore__yellow_timer == SmartSemaphore_ctx__yellow_time)
+                for(i = 0; i <= 11;i++)
                 {
-                    for(i = 0; i <= 11;i++)
-                    {
-                        SmartSemaphore__semaphores_i[i] = 2;
-                    }
-                    {
-                        SmartSemaphore_ctx__STATE current_order_state;
-                        
-                        Priority__current(&current_order_state);
-                        if(current_order_state == SmartSemaphore_ctx__LO)
-                        {
-                            SmartSemaphore__semaphores_i[7] = 1;
-                            SmartSemaphore__semaphores_i[10] = 1;
-                        }
-                        else if(current_order_state == SmartSemaphore_ctx__DNS)
-                        {
-                            SmartSemaphore__semaphores_i[3] = 1;
-                            SmartSemaphore__semaphores_i[5] = 1;
-                            SmartSemaphore__semaphores_i[0] = 1;
-                            SmartSemaphore__semaphores_i[2] = 1;
-                            SmartSemaphore__semaphores_i[11] = 1;
-                            SmartSemaphore__semaphores_i[8] = 1;
-                        }
-                        else if(current_order_state == SmartSemaphore_ctx__DLO)
-                        {
-                            SmartSemaphore__semaphores_i[5] = 1;
-                            SmartSemaphore__semaphores_i[2] = 1;
-                            SmartSemaphore__semaphores_i[11] = 1;
-                            SmartSemaphore__semaphores_i[9] = 1;
-                            SmartSemaphore__semaphores_i[8] = 1;
-                            SmartSemaphore__semaphores_i[6] = 1;
-                        }
-                        else
-                        {
-                            SmartSemaphore__semaphores_i[7] = 1;
-                            SmartSemaphore__semaphores_i[10] = 1;
-                        }
-                    }
+                    SmartSemaphore__semaphores_i[i] = 2;
+                }
+                SmartSemaphore_ctx__STATE current_order_state;
+ 
+                Priority__current(&current_order_state);
+
+                if(current_order_state == SmartSemaphore_ctx__LO)
+                {
+                    SmartSemaphore__semaphores_i[7] = 1;
+                    SmartSemaphore__semaphores_i[10] = 1;
+                }
+                else if(current_order_state == SmartSemaphore_ctx__DNS)
+                {
+                    SmartSemaphore__semaphores_i[3] = 1;
+                    SmartSemaphore__semaphores_i[5] = 1;
+                    SmartSemaphore__semaphores_i[0] = 1;
+                    SmartSemaphore__semaphores_i[2] = 1;
+                    SmartSemaphore__semaphores_i[11] = 1;
+                    SmartSemaphore__semaphores_i[8] = 1;
+                }
+                else if(current_order_state == SmartSemaphore_ctx__DLO)
+                {
+                    SmartSemaphore__semaphores_i[5] = 1;
+                    SmartSemaphore__semaphores_i[2] = 1;
+                    SmartSemaphore__semaphores_i[11] = 1;
+                    SmartSemaphore__semaphores_i[9] = 1;
+                    SmartSemaphore__semaphores_i[8] = 1;
+                    SmartSemaphore__semaphores_i[6] = 1;
+                }
+                else
+                {
+                    SmartSemaphore__semaphores_i[7] = 1;
+                    SmartSemaphore__semaphores_i[10] = 1;
                 }
             }
             else
@@ -411,45 +408,43 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
         }
         else if(SmartSemaphore__priority_phase == SmartSemaphore_ctx__ACTIVE)
         {
-            if((SmartSemaphore__timer) > (1))
+            if((SmartSemaphore__timer) > (0))
             {
                 SmartSemaphore__timer = SmartSemaphore__timer-1;
                 (*st) = SmartSemaphore__timer-1;
                 (*yt) = 0;
-                if(SmartSemaphore__timer == SmartSemaphore_ctx__max_time)
+                for(i = 0; i <= 11;i++)
                 {
-                    for(i = 0; i <= 11;i++)
-                    {
-                        SmartSemaphore__semaphores_i[i] = 2;
-                    }
-                    if(SmartSemaphore__priority == SmartSemaphore_ctx__LO)
-                    {
-                        SmartSemaphore__semaphores_i[7] = 0;
-                        SmartSemaphore__semaphores_i[10] = 0;
-                    }
-                    else if(SmartSemaphore__priority == SmartSemaphore_ctx__DNS)
-                    {
-                        SmartSemaphore__semaphores_i[3] = 0;
-                        SmartSemaphore__semaphores_i[5] = 0;
-                        SmartSemaphore__semaphores_i[0] = 0;
-                        SmartSemaphore__semaphores_i[2] = 0;
-                        SmartSemaphore__semaphores_i[11] = 0;
-                        SmartSemaphore__semaphores_i[8] = 0;
-                    }
-                    else if(SmartSemaphore__priority == SmartSemaphore_ctx__DLO)
-                    {
-                        SmartSemaphore__semaphores_i[5] = 0;
-                        SmartSemaphore__semaphores_i[2] = 0;
-                        SmartSemaphore__semaphores_i[11] = 0;
-                        SmartSemaphore__semaphores_i[9] = 0;
-                        SmartSemaphore__semaphores_i[8] = 0;
-                        SmartSemaphore__semaphores_i[6] = 0;
-                    }
-                    else
-                    {
-                        SmartSemaphore__semaphores_i[1] = 0;
-                        SmartSemaphore__semaphores_i[4] = 0;
-                    }
+                    SmartSemaphore__semaphores_i[i] = 2;
+                }
+
+                if(SmartSemaphore__priority == SmartSemaphore_ctx__LO)
+                {
+                    SmartSemaphore__semaphores_i[7] = 0;
+                    SmartSemaphore__semaphores_i[10] = 0;
+                }
+                else if(SmartSemaphore__priority == SmartSemaphore_ctx__DNS)
+                {
+                    SmartSemaphore__semaphores_i[3] = 0;
+                    SmartSemaphore__semaphores_i[5] = 0;
+                    SmartSemaphore__semaphores_i[0] = 0;
+                    SmartSemaphore__semaphores_i[2] = 0;
+                    SmartSemaphore__semaphores_i[11] = 0;
+                    SmartSemaphore__semaphores_i[8] = 0;
+                }
+                else if(SmartSemaphore__priority == SmartSemaphore_ctx__DLO)
+                {
+                    SmartSemaphore__semaphores_i[5] = 0;
+                    SmartSemaphore__semaphores_i[2] = 0;
+                    SmartSemaphore__semaphores_i[11] = 0;
+                    SmartSemaphore__semaphores_i[9] = 0;
+                    SmartSemaphore__semaphores_i[8] = 0;
+                    SmartSemaphore__semaphores_i[6] = 0;
+                }
+                else
+                {
+                    SmartSemaphore__semaphores_i[1] = 0;
+                    SmartSemaphore__semaphores_i[4] = 0;
                 }
             }
             else
@@ -462,45 +457,42 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
         }
         else if(SmartSemaphore__priority_phase == SmartSemaphore_ctx__EXITING)
         {
-            if((SmartSemaphore__yellow_timer) > (1))
+            if((SmartSemaphore__yellow_timer) > (0))
             {
                 SmartSemaphore__yellow_timer = SmartSemaphore__yellow_timer-1;
                 (*st) = 0;
                 (*yt) = SmartSemaphore__yellow_timer-1;
-                if(SmartSemaphore__yellow_timer == SmartSemaphore_ctx__yellow_time)
+                for(i = 0; i <= 11;i++)
                 {
-                    for(i = 0; i <= 11;i++)
-                    {
-                        SmartSemaphore__semaphores_i[i] = 2;
-                    }
-                    if(SmartSemaphore__priority == SmartSemaphore_ctx__LO)
-                    {
-                        SmartSemaphore__semaphores_i[7] = 1;
-                        SmartSemaphore__semaphores_i[10] = 1;
-                    }
-                    else if(SmartSemaphore__priority == SmartSemaphore_ctx__DNS)
-                    {
-                        SmartSemaphore__semaphores_i[3] = 1;
-                        SmartSemaphore__semaphores_i[5] = 1;
-                        SmartSemaphore__semaphores_i[0] = 1;
-                        SmartSemaphore__semaphores_i[2] = 1;
-                        SmartSemaphore__semaphores_i[11] = 1;
-                        SmartSemaphore__semaphores_i[8] = 1;
-                    }
-                    else if(SmartSemaphore__priority == SmartSemaphore_ctx__DLO)
-                    {
-                        SmartSemaphore__semaphores_i[5] = 1;
-                        SmartSemaphore__semaphores_i[2] = 1;
-                        SmartSemaphore__semaphores_i[11] = 1;
-                        SmartSemaphore__semaphores_i[9] = 1;
-                        SmartSemaphore__semaphores_i[8] = 1;
-                        SmartSemaphore__semaphores_i[6] = 1;
-                    }
-                    else
-                    {
-                        SmartSemaphore__semaphores_i[7] = 1;
-                        SmartSemaphore__semaphores_i[10] = 1;
-                    }
+                    SmartSemaphore__semaphores_i[i] = 2;
+                }
+                if(SmartSemaphore__priority == SmartSemaphore_ctx__LO)
+                {
+                    SmartSemaphore__semaphores_i[7] = 1;
+                    SmartSemaphore__semaphores_i[10] = 1;
+                }
+                else if(SmartSemaphore__priority == SmartSemaphore_ctx__DNS)
+                {
+                    SmartSemaphore__semaphores_i[3] = 1;
+                    SmartSemaphore__semaphores_i[5] = 1;
+                    SmartSemaphore__semaphores_i[0] = 1;
+                    SmartSemaphore__semaphores_i[2] = 1;
+                    SmartSemaphore__semaphores_i[11] = 1;
+                    SmartSemaphore__semaphores_i[8] = 1;
+                }
+                else if(SmartSemaphore__priority == SmartSemaphore_ctx__DLO)
+                {
+                    SmartSemaphore__semaphores_i[5] = 1;
+                    SmartSemaphore__semaphores_i[2] = 1;
+                    SmartSemaphore__semaphores_i[11] = 1;
+                    SmartSemaphore__semaphores_i[9] = 1;
+                    SmartSemaphore__semaphores_i[8] = 1;
+                    SmartSemaphore__semaphores_i[6] = 1;
+                }
+                else
+                {
+                    SmartSemaphore__semaphores_i[7] = 1;
+                    SmartSemaphore__semaphores_i[10] = 1;
                 }
             }
             else
@@ -508,8 +500,8 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
                 SmartSemaphore__has_priority = false;
                 {
                     SmartSemaphore_ctx__STATE current_state;
-                    
                     Priority__current(&current_state);
+
                     if(current_state == SmartSemaphore_ctx__NS)
                     {
                         SmartSemaphore__timer = SmartSemaphore__time_i[0];
@@ -532,6 +524,7 @@ void SmartSemaphore__process_semaphore_priority(int32_t *st, int32_t *yt)
                     SmartSemaphore_ctx__STATE current_state;
                     
                     Priority__current(&current_state);
+
                     for(i = 0; i <= 11;i++)
                     {
                         SmartSemaphore__semaphores_i[i] = 2;

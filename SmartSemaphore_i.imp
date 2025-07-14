@@ -79,7 +79,8 @@ OPERATIONS
         BEGIN
             has_priority := TRUE;
             priority := ss;
-            timer := max_time
+            timer := max_time;
+            yellow_timer := yellow_time
         END;
     
    status <-- pre_op_prioritize(ss) =
@@ -209,7 +210,7 @@ OPERATIONS
                         semaphores_i(9) := 1; semaphores_i(8) := 1; semaphores_i(6) := 1
                     ELSE
                         semaphores_i := (0..11) * {2};
-                        semaphores_i(1) := 1; semaphores_i(4) := 1
+                        semaphores_i(7) := 1; semaphores_i(10) := 1
                     END ;
                     yellow_timer := yellow_timer - 1;
                     st := timer;
@@ -255,26 +256,24 @@ OPERATIONS
      st, yt <-- process_semaphore_priority =
      BEGIN
          IF priority_phase = TRANSITIONING THEN
-             IF yellow_timer > 1 THEN
+             IF yellow_timer > 0 THEN
                  yellow_timer := yellow_timer - 1;
                  st := timer;
                  yt := yellow_timer;
-                 IF yellow_timer = yellow_time THEN 
-                   semaphores_i := (0..11) * {2}; 
-                   VAR current_order_state IN 
-                       current_order_state <-- current; 
-                       IF current_order_state = LO THEN
-                          semaphores_i(7) := 1; semaphores_i(10) := 1 
-                       ELSIF current_order_state = DNS THEN
-                          semaphores_i(3) := 1; semaphores_i(5) := 1; semaphores_i(0) := 1;
-                          semaphores_i(2) := 1; semaphores_i(11) := 1; semaphores_i(8) := 1
-                       ELSIF current_order_state = DLO THEN
-                          semaphores_i(5) := 1; semaphores_i(2) := 1; semaphores_i(11) := 1;
-                          semaphores_i(9) := 1; semaphores_i(8) := 1; semaphores_i(6) := 1
-                       ELSE
-                          semaphores_i(1) := 1; semaphores_i(4) := 1
-                       END
-                   END
+                 semaphores_i := (0..11) * {2}; 
+                 VAR current_order_state IN 
+                    current_order_state <-- current; 
+                    IF current_order_state = LO THEN
+                       semaphores_i(7) := 1; semaphores_i(10) := 1 
+                    ELSIF current_order_state = DNS THEN
+                       semaphores_i(3) := 1; semaphores_i(5) := 1; semaphores_i(0) := 1;
+                       semaphores_i(2) := 1; semaphores_i(11) := 1; semaphores_i(8) := 1
+                    ELSIF current_order_state = DLO THEN
+                       semaphores_i(5) := 1; semaphores_i(2) := 1; semaphores_i(11) := 1;
+                       semaphores_i(9) := 1; semaphores_i(8) := 1; semaphores_i(6) := 1
+                    ELSE
+                       semaphores_i(7) := 1; semaphores_i(10) := 1
+                    END
                  END
              ELSE
                  priority_phase := ACTIVE;
@@ -283,23 +282,21 @@ OPERATIONS
                  yt := yellow_timer
              END
          ELSIF priority_phase = ACTIVE THEN
-             IF timer > 1 THEN
+             IF timer > 0 THEN
                  timer := timer - 1;
                  st := timer - 1;
                  yt := 0;
-                 IF timer = max_time THEN 
-                   semaphores_i := (0..11) * {2}; 
-                   IF priority = LO THEN 
-                          semaphores_i(7) := 0; semaphores_i(10) := 0 
-                   ELSIF priority = DNS THEN
-                          semaphores_i(3) := 0; semaphores_i(5) := 0; semaphores_i(0) := 0;
-                          semaphores_i(2) := 0; semaphores_i(11) := 0; semaphores_i(8) := 0
-                   ELSIF priority = DLO THEN
-                          semaphores_i(5) := 0; semaphores_i(2) := 0; semaphores_i(11) := 0;
-                          semaphores_i(9) := 0; semaphores_i(8) := 0; semaphores_i(6) := 0
-                   ELSE 
-                          semaphores_i(1) := 0; semaphores_i(4) := 0
-                   END
+                 semaphores_i := (0..11) * {2}; 
+                 IF priority = LO THEN 
+                    semaphores_i(7) := 0; semaphores_i(10) := 0 
+                 ELSIF priority = DNS THEN
+                    semaphores_i(3) := 0; semaphores_i(5) := 0; semaphores_i(0) := 0;
+                    semaphores_i(2) := 0; semaphores_i(11) := 0; semaphores_i(8) := 0
+                 ELSIF priority = DLO THEN
+                    semaphores_i(5) := 0; semaphores_i(2) := 0; semaphores_i(11) := 0;
+                    semaphores_i(9) := 0; semaphores_i(8) := 0; semaphores_i(6) := 0
+                 ELSE 
+                    semaphores_i(1) := 0; semaphores_i(4) := 0
                  END
              ELSE 
                  priority_phase := EXITING;
@@ -312,19 +309,17 @@ OPERATIONS
                  yellow_timer := yellow_timer - 1;
                  st := 0;
                  yt := yellow_timer - 1;
-                 IF yellow_timer = yellow_time THEN 
-                   semaphores_i := (0..11) * {2};
-                   IF priority = LO THEN 
-                          semaphores_i(7) := 1; semaphores_i(10) := 1
-                   ELSIF priority = DNS THEN
-                          semaphores_i(3) := 1; semaphores_i(5) := 1; semaphores_i(0) := 1;
-                          semaphores_i(2) := 1; semaphores_i(11) := 1; semaphores_i(8) := 1
-                   ELSIF priority = DLO THEN
-                          semaphores_i(5) := 1; semaphores_i(2) := 1; semaphores_i(11) := 1;
-                          semaphores_i(9) := 1; semaphores_i(8) := 1; semaphores_i(6) := 1
-                   ELSE 
-                          semaphores_i(1) := 1; semaphores_i(4) := 1
-                   END
+                 semaphores_i := (0..11) * {2};
+                 IF priority = LO THEN 
+                      semaphores_i(7) := 1; semaphores_i(10) := 1
+                 ELSIF priority = DNS THEN
+                      semaphores_i(3) := 1; semaphores_i(5) := 1; semaphores_i(0) := 1;
+                      semaphores_i(2) := 1; semaphores_i(11) := 1; semaphores_i(8) := 1
+                 ELSIF priority = DLO THEN
+                      semaphores_i(5) := 1; semaphores_i(2) := 1; semaphores_i(11) := 1;
+                      semaphores_i(9) := 1; semaphores_i(8) := 1; semaphores_i(6) := 1
+                 ELSE 
+                      semaphores_i(7) := 1; semaphores_i(10) := 1
                  END
              ELSE 
                  has_priority := FALSE;
